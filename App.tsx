@@ -274,7 +274,7 @@ export default function App() {
           <MintingSection 
             onMint={handleMint}
             isMinting={isMinting}
-            canMint={score >= MINT_THRESHOLD || (stage === AppStage.GAME_OVER && score >= MINT_THRESHOLD)}
+            canMint={score >= getMintThreshold(selectedGame) || (stage === AppStage.GAME_OVER && score >= getMintThreshold(selectedGame))}
             totalMinted={totalMinted}
             maxSupply={totalCount}
             isWalletConnected={!!address}
