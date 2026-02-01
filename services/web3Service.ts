@@ -8,6 +8,7 @@ const CONTRACT_ABI = [
   "function hasMinted(address wallet) external view returns (bool)",
   "function MINT_PRICE() external view returns (uint256)",
   "function MAX_SUPPLY() external view returns (uint256)",
+  "function totalSupply() external view returns (uint256)",
   "event NFTMinted(address indexed player, uint256 tokenId)"
 ];
 

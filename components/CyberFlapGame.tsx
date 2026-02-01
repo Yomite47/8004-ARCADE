@@ -266,10 +266,11 @@ export const CyberFlapGame: React.FC<CyberFlapGameProps> = ({ onGameOver, onScor
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <canvas 
         ref={canvasRef} 
-        className="block bg-black border-2 border-cyan-500/50 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.2)]"
+        className="block w-full bg-black border-2 border-cyan-500/50 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.2)] touch-none"
+        style={{ touchAction: 'none' }}
       />
     </div>
   );

@@ -44,6 +44,18 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [stage]);
 
+  // Fetch total supply on load
+  useEffect(() => {
+      const fetchSupply = async () => {
+          const supply = await getTotalMinted();
+          setTotalMinted(supply);
+      };
+      fetchSupply();
+      // Optional: Poll every 30s
+      const interval = setInterval(fetchSupply, 30000);
+      return () => clearInterval(interval);
+  }, []);
+
   const handleScoreUpdate = (newScore: number) => {
     setScore(newScore);
     const threshold = getMintThreshold(selectedGame);

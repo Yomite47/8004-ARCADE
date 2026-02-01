@@ -69,12 +69,13 @@ contract Arcade8004 is ERC721, Ownable {
     }
 
     /**
-     * @dev Withdraws the collected ETH to the owner's wallet
+     * @dev Withdraws the collected ETH to a specific wallet
      */
-    function withdraw() external onlyOwner {
+    function withdraw(address payable _recipient) external onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
-        payable(owner()).transfer(balance);
+        require(_recipient != address(0), "Invalid recipient address");
+        _recipient.transfer(balance);
     }
 
     /**
@@ -115,5 +116,12 @@ contract Arcade8004 is ERC721, Ownable {
      */
     function canMint(address wallet) external view returns (bool) {
         return !hasMinted[wallet];
+    }
+
+    /**
+     * @dev Returns the total number of tokens minted
+     */
+    function totalSupply() external view returns (uint256) {
+        return _tokenIds;
     }
 }

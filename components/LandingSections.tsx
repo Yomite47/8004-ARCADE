@@ -444,7 +444,7 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
              <div className="space-y-2 z-10 font-mono text-xs text-gray-400">
                <div className="flex justify-between border-b border-white/10 pb-1">
                  <span>CLASS</span>
-                 <span className="text-white">RUNNER_PROOF</span>
+                 <span className="text-white">ARCADE_PROOF</span>
                </div>
                <div className="flex justify-between border-b border-white/10 pb-1">
                  <span>SUPPLY</span>
