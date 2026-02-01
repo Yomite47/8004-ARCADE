@@ -79,7 +79,7 @@ export const checkCanMint = async (walletAddress: string): Promise<boolean> => {
   }
 };
 
-export const mintNFT = async (score: number, walletAddress: string): Promise<{ success: boolean; error?: string }> => {
+export const mintNFT = async (score: number, walletAddress: string, game: string): Promise<{ success: boolean; error?: string }> => {
   const provider = getProvider();
   if (!provider) return { success: false, error: "No wallet provider found" };
 
@@ -97,7 +97,7 @@ export const mintNFT = async (score: number, walletAddress: string): Promise<{ s
       const response = await fetch('/api/sign-mint', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress, score }) 
+        body: JSON.stringify({ wallet: walletAddress, score, game }) 
       });
 
       if (!response.ok) {

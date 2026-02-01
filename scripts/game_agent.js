@@ -39,7 +39,7 @@ const server = http.createServer(async (req, res) => {
         req.on('end', async () => {
             try {
                 const data = JSON.parse(body);
-                const { wallet, score } = data;
+                const { wallet, score, game } = data;
 
                 if (!wallet || !score) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -47,11 +47,12 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
 
-                console.log(`Received sign request for ${wallet} with score ${score}`);
+                console.log(`Received sign request for ${wallet} with score ${score} in game ${game}`);
 
-                if (score < MINT_THRESHOLD) {
+                const threshold = MINT_THRESHOLDS[game] || 500;
+                if (score < threshold) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: "Score below threshold" }));
+                    res.end(JSON.stringify({ error: `Score below threshold (${threshold})` }));
                     return;
                 }
 

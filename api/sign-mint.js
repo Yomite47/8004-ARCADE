@@ -31,14 +31,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { wallet, score } = req.body;
+    const { wallet, score, game } = req.body;
 
     if (!wallet || !score) {
       return res.status(400).json({ error: "Missing wallet or score" });
     }
 
-    if (score < MINT_THRESHOLD) {
-      return res.status(400).json({ error: "Score below threshold" });
+    const threshold = MINT_THRESHOLDS[game] || 500;
+    if (score < threshold) {
+      return res.status(400).json({ error: `Score below threshold (${threshold})` });
     }
 
     const signer = new ethers.Wallet(PRIVATE_KEY);

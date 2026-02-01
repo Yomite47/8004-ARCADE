@@ -286,7 +286,7 @@ export const HeroSection: React.FC<SectionProps> = ({
             <div className="relative">
               <div className="text-6xl font-bold text-white/5 mb-4">03</div>
               <h4 className="text-lg font-bold mb-2">Qualify</h4>
-              <p className="text-sm text-gray-400">Reach the score threshold (500) to trigger the agent.</p>
+              <p className="text-sm text-gray-400">Reach the protocol threshold to trigger the agent.</p>
             </div>
 
             <div className="relative">

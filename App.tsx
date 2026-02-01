@@ -27,7 +27,17 @@ export default function App() {
   const totalCount = "5555";
 
   // Mint threshold constant
-  const MINT_THRESHOLD = 300;
+  const getMintThreshold = (game: 'RUNNER' | 'SNAKE' | 'BLOCK_BREAKER' | 'SPACE_INVADERS' | 'VIRUS_WHACK' | 'CYBER_FLAP') => {
+    switch (game) {
+        case 'RUNNER': return 1000;
+        case 'VIRUS_WHACK': return 500;
+        case 'CYBER_FLAP': return 500;
+        case 'SNAKE': return 500;
+        case 'SPACE_INVADERS': return 1000;
+        case 'BLOCK_BREAKER': return 1000;
+        default: return 500;
+    }
+  };
 
   // Effects to handle stage transitions
   useEffect(() => {
@@ -36,7 +46,8 @@ export default function App() {
 
   const handleScoreUpdate = (newScore: number) => {
     setScore(newScore);
-    if (newScore >= MINT_THRESHOLD && stage === AppStage.GAME && !hasMinted) {
+    const threshold = getMintThreshold(selectedGame);
+    if (newScore >= threshold && stage === AppStage.GAME && !hasMinted) {
         setStage(AppStage.MINT_PROMPT);
     }
   };
@@ -161,7 +172,7 @@ export default function App() {
     
     setIsMinting(true);
     try {
-      const result = await mintNFT(score, address);
+      const result = await mintNFT(score, address, selectedGame);
       if (result.success) {
         setHasMinted(true);
         setStage(AppStage.MINT_SUCCESS);
@@ -339,10 +350,10 @@ export default function App() {
                         <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
                         <div className="text-xs text-gray-500 uppercase tracking-widest mb-1">Performance Status</div>
                         <div className="text-3xl font-mono text-white mb-4">
-                           {score >= MINT_THRESHOLD ? "QUALIFIED" : "INSUFFICIENT"}
+                           {score >= getMintThreshold(selectedGame) ? "QUALIFIED" : "INSUFFICIENT"}
                         </div>
                         
-                        {score >= MINT_THRESHOLD ? (
+                        {score >= getMintThreshold(selectedGame) ? (
                             <div className="flex items-center justify-center gap-2 text-green-400 bg-green-900/20 py-2 border border-green-500/30">
                                 <CheckCircle2 size={16} />
                                 <span className="text-sm font-bold tracking-wider">MINT UNLOCKED</span>
@@ -355,7 +366,7 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-full">
-                        {score >= MINT_THRESHOLD && (
+                        {score >= getMintThreshold(selectedGame) && (
                             <Button onClick={handleMint} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200">
                                 MINT PROOF OF RUN
                             </Button>
