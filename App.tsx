@@ -9,7 +9,7 @@ import { Button } from './components/Button';
 import { HeroSection, StorySection, GameplaySection, MintingSection, Footer } from './components/LandingSections';
 import { AppStage } from './types';
 import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight } from 'lucide-react';
-import { connectWallet, mintNFT, checkCanMint } from './services/web3Service';
+import { connectWallet, mintNFT, checkCanMint, getTotalMinted } from './services/web3Service';
 
 export default function App() {
   const [stage, setStage] = useState<AppStage>(AppStage.LANDING);
@@ -22,8 +22,8 @@ export default function App() {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   
-  // Mock Data
-  const totalMinted = "4050";
+  // State for total minted count
+  const [totalMinted, setTotalMinted] = useState("4050");
   const totalCount = "5555";
 
   // Mint threshold constant

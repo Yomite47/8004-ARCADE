@@ -127,6 +127,30 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
 
   } catch (error: any) {
     console.error("Minting error:", error);
-    return { success: false, error: error.message || "Minting failed" };
+    
+    let errorMessage = "Minting failed. Please try again.";
+
+    // 1. User Rejected
+    if (error.code === 'ACTION_REJECTED' || error.code === 4001 || error.message?.includes('user rejected')) {
+        errorMessage = "Transaction cancelled.";
+    } 
+    // 2. Already Minted (Contract Revert)
+    else if (
+        error.message?.includes('Wallet has already minted') || 
+        error.reason?.includes('Wallet has already minted') ||
+        error.data?.message?.includes('Wallet has already minted')
+    ) {
+        errorMessage = "You have already minted an NFT! Limit one per wallet.";
+    }
+    // 3. Insufficient Funds (Gas or Value)
+    else if (error.code === 'INSUFFICIENT_FUNDS' || error.message?.includes('insufficient funds')) {
+        errorMessage = "Insufficient funds for minting (0.002 ETH + Gas).";
+    }
+    // 4. Contract Logic Reverts
+    else if (error.reason) {
+        errorMessage = `Minting failed: ${error.reason}`;
+    }
+
+    return { success: false, error: errorMessage };
   }
 };
