@@ -9,7 +9,7 @@ import { Button } from './components/Button';
 import { HeroSection, StorySection, GameplaySection, MintingSection, Footer } from './components/LandingSections';
 import { AppStage } from './types';
 import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight } from 'lucide-react';
-import { connectWallet, mintNFT } from './services/mockWeb3';
+import { connectWallet, mintNFT } from './services/web3Service';
 
 export default function App() {
   const [stage, setStage] = useState<AppStage>(AppStage.LANDING);
