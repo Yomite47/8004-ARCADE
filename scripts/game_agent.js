@@ -2,9 +2,17 @@ const http = require('http');
 const { ethers } = require('ethers');
 require('dotenv').config();
 
-const PORT = 3001;
+const PORT = 3000;
 const CONTRACT_ADDRESS = "0xec21C17F1CD883aC5CDc449620e4399EaDee33F3"; // Deployed address
-const MINT_THRESHOLD = 300;
+
+const MINT_THRESHOLDS = {
+    'RUNNER': 20,
+    'VIRUS_WHACK': 20,
+    'CYBER_FLAP': 20,
+    'BLOCK_BREAKER': 600,
+    'SNAKE': 500,
+    'SPACE_INVADERS': 1000
+};
 
 // Load Private Key
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -30,7 +38,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'POST' && req.url === '/sign-mint') {
+    if (req.method === 'POST' && (req.url === '/sign-mint' || req.url === '/api/sign-mint')) {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();

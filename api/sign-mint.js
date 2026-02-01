@@ -4,7 +4,14 @@ import { ethers } from 'ethers';
 // For local development, they are loaded from .env
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CONTRACT_ADDRESS = "0xec21C17F1CD883aC5CDc449620e4399EaDee33F3";
-const MINT_THRESHOLD = 300;
+const MINT_THRESHOLDS = {
+    'RUNNER': 20,
+    'VIRUS_WHACK': 20,
+    'CYBER_FLAP': 20,
+    'BLOCK_BREAKER': 600,
+    'SNAKE': 500,
+    'SPACE_INVADERS': 1000
+};
 
 export default async function handler(req, res) {
   // CORS Headers
