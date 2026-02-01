@@ -36,16 +36,34 @@ This handles both the **Frontend** (React Game) and the **Backend** (Game Agent/
 5.  The app will call `/api/sign-mint`.
 6.  If your `PRIVATE_KEY` is correct, the transaction will pop up in MetaMask.
 
-## 5. Using a Custom Domain
-You can easily use your own domain (e.g., `www.yourgame.com`):
+## 5. Using a Custom Domain (DNS Configuration)
+To use your own domain (e.g., `8004arcade.com` or `www.8004arcade.com`), follow these specific DNS steps:
 
-1.  Go to your Project Settings in Vercel.
-2.  Select **"Domains"** from the left sidebar.
-3.  Enter your domain name and click **"Add"**.
-4.  Vercel will provide DNS records (A Record or CNAME).
-5.  Login to your Domain Registrar (GoDaddy, Namecheap, etc.).
-6.  Add the records provided by Vercel.
-7.  Wait for propagation (usually minutes). Vercel will automatically issue an SSL certificate.
+1.  **Vercel Settings:**
+    - Go to your Project > **Settings** > **Domains**.
+    - Add your domain (e.g., `8004arcade.com`).
+    - Vercel will recommend adding `www.8004arcade.com` as well. Add both.
+
+2.  **Configure DNS (at your Registrar):**
+    Log in to where you bought your domain (GoDaddy, Namecheap, etc.) and find the **DNS Management** or **DNS Records** section.
+
+    **Step A: The CNAME Record (For "www")**
+    This connects `www.8004arcade.com` to Vercel.
+    - **Type:** `CNAME`
+    - **Name / Host:** `www`
+    - **Value / Target:** `cname.vercel-dns.com`
+    - **TTL:** `Default` or `1 Hour`
+
+    **Step B: The A Record (For root domain)**
+    This connects `8004arcade.com` (without www) to Vercel.
+    - **Type:** `A`
+    - **Name / Host:** `@` (or leave blank if your provider requires it)
+    - **Value / Target:** `76.76.21.21` (Vercel's IP)
+    - **TTL:** `Default` or `1 Hour`
+
+3.  **Wait for Propagation:**
+    - DNS changes can take a few minutes to 24 hours (usually fast).
+    - In Vercel, the "Invalid Configuration" error will turn into a green checkmark once the records are found.
 
 Your game code is already compatible with any domain!
 

@@ -33,6 +33,8 @@ interface Block {
   value: number;
 }
 
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+
 export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -50,6 +52,19 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
   const ROW_COUNT = 5;
   const COL_COUNT = 8;
   const PADDLE_BOTTOM_MARGIN = 30;
+
+  const handleTouchDirection = (direction: 'left' | 'right' | 'stop') => {
+    if (direction === 'left') {
+      leftArrowPressed.current = true;
+      rightArrowPressed.current = false;
+    } else if (direction === 'right') {
+      rightArrowPressed.current = true;
+      leftArrowPressed.current = false;
+    } else {
+      leftArrowPressed.current = false;
+      rightArrowPressed.current = false;
+    }
+  };
 
   const initGame = (canvas: HTMLCanvasElement) => {
     scoreRef.current = 0;
@@ -273,10 +288,32 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
     <div className="w-full h-full flex flex-col items-center justify-center bg-black/90">
       <canvas
         ref={canvasRef}
-        className="border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+        className="border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)] max-w-full"
       />
       <div className="mt-4 text-gray-500 text-sm">
-        Use Left/Right Arrows to Move
+        Use Left/Right Arrows or Touch Controls to Move
+      </div>
+      
+      {/* Mobile Controls */}
+      <div className="flex gap-4 mt-4">
+        <button 
+          onMouseDown={() => handleTouchDirection('left')}
+          onMouseUp={() => handleTouchDirection('stop')}
+          onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('left'); }}
+          onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
+          className="p-4 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+        >
+          <ArrowLeft size={32} className="text-white" />
+        </button>
+        <button 
+          onMouseDown={() => handleTouchDirection('right')}
+          onMouseUp={() => handleTouchDirection('stop')}
+          onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('right'); }}
+          onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
+          className="p-4 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+        >
+          <ArrowRight size={32} className="text-white" />
+        </button>
       </div>
     </div>
   );

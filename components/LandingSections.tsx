@@ -177,7 +177,7 @@ export const HeroSection: React.FC<SectionProps> = ({
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <GameCard 
-              title="8004 Runner"
+              title="8004 Arcade"
               description="High-velocity traversal simulation. Avoid digital obstacles and maintain momentum."
               icon={<Zap size={24} />}
               accentColor="text-yellow-400"

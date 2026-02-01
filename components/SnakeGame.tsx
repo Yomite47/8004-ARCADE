@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface SnakeGameProps {
   onGameOver: (score: number) => void;
@@ -213,10 +214,40 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate 
     <div className="w-full h-full flex flex-col items-center justify-center bg-black/90">
       <canvas
         ref={canvasRef}
-        className="border-2 border-white/20 shadow-[0_0_20px_rgba(0,243,255,0.2)]"
+        className="border-2 border-white/20 shadow-[0_0_20px_rgba(0,243,255,0.2)] max-w-full"
       />
       <div className="mt-4 text-gray-500 text-sm">
-        Use Arrow Keys to Move
+        Use Arrow Keys or Touch Controls to Move
+      </div>
+
+      {/* Mobile Controls */}
+      <div className="flex flex-col items-center gap-2 mt-4">
+        <button 
+          onClick={() => handleTouchDirection({ x: 0, y: -1 })} 
+          className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+        >
+          <ArrowUp size={24} className="text-white" />
+        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => handleTouchDirection({ x: -1, y: 0 })} 
+            className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          >
+            <ArrowLeft size={24} className="text-white" />
+          </button>
+          <button 
+            onClick={() => handleTouchDirection({ x: 1, y: 0 })} 
+            className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          >
+            <ArrowRight size={24} className="text-white" />
+          </button>
+        </div>
+        <button 
+          onClick={() => handleTouchDirection({ x: 0, y: 1 })} 
+          className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+        >
+          <ArrowDown size={24} className="text-white" />
+        </button>
       </div>
     </div>
   );

@@ -26,6 +26,8 @@ interface Enemy extends GameObject {
   value: number;
 }
 
+import { ArrowLeft, ArrowRight, Crosshair } from 'lucide-react';
+
 export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -52,6 +54,23 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
   const ENEMY_WIDTH = 30;
   const ENEMY_HEIGHT = 20;
   const ENEMY_PADDING = 15;
+
+  const handleTouchDirection = (direction: 'left' | 'right' | 'stop') => {
+    if (direction === 'left') {
+      leftArrowPressed.current = true;
+      rightArrowPressed.current = false;
+    } else if (direction === 'right') {
+      rightArrowPressed.current = true;
+      leftArrowPressed.current = false;
+    } else {
+      leftArrowPressed.current = false;
+      rightArrowPressed.current = false;
+    }
+  };
+
+  const handleTouchFire = (firing: boolean) => {
+    spacePressed.current = firing;
+  };
 
   const initGame = (canvas: HTMLCanvasElement) => {
     scoreRef.current = 0;
@@ -369,16 +388,50 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-col items-center">
       <canvas 
         ref={canvasRef} 
-        className="block bg-black border-2 border-green-500/50 rounded-lg shadow-[0_0_20px_rgba(0,255,0,0.3)]"
+        className="block bg-black border-2 border-green-500/50 rounded-lg shadow-[0_0_20px_rgba(0,255,0,0.3)] max-w-full"
       />
       {isPaused && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-mono text-2xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-mono text-2xl" style={{ maxHeight: '500px' }}>
           PAUSED
         </div>
       )}
+
+      {/* Mobile Controls */}
+      <div className="flex gap-8 mt-4">
+        <div className="flex gap-4">
+          <button 
+            onMouseDown={() => handleTouchDirection('left')}
+            onMouseUp={() => handleTouchDirection('stop')}
+            onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('left'); }}
+            onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
+            className="p-4 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
+          >
+            <ArrowLeft size={32} className="text-green-400" />
+          </button>
+          <button 
+            onMouseDown={() => handleTouchDirection('right')}
+            onMouseUp={() => handleTouchDirection('stop')}
+            onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('right'); }}
+            onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
+            className="p-4 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
+          >
+            <ArrowRight size={32} className="text-green-400" />
+          </button>
+        </div>
+        
+        <button 
+          onMouseDown={() => handleTouchFire(true)}
+          onMouseUp={() => handleTouchFire(false)}
+          onTouchStart={(e) => { e.preventDefault(); handleTouchFire(true); }}
+          onTouchEnd={(e) => { e.preventDefault(); handleTouchFire(false); }}
+          className="p-4 bg-red-500/10 rounded-full active:bg-red-500/30 transition-colors border border-red-500/30"
+        >
+          <Crosshair size={32} className="text-red-400" />
+        </button>
+      </div>
     </div>
   );
 };

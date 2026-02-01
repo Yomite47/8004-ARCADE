@@ -235,7 +235,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     <div className="relative">
       <canvas 
         ref={canvasRef} 
-        className="block bg-black border-2 border-red-500/50 rounded-lg shadow-[0_0_20px_rgba(255,0,0,0.2)] cursor-crosshair"
+        className="block bg-black border-2 border-red-500/50 rounded-lg shadow-[0_0_20px_rgba(255,0,0,0.2)] cursor-crosshair max-w-full"
       />
       <div className="absolute top-4 right-4 flex gap-2">
         {[...Array(3)].map((_, i) => (

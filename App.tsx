@@ -9,7 +9,7 @@ import { Button } from './components/Button';
 import { HeroSection, StorySection, GameplaySection, MintingSection, Footer } from './components/LandingSections';
 import { AppStage } from './types';
 import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight } from 'lucide-react';
-import { connectWallet, mintNFT } from './services/web3Service';
+import { connectWallet, mintNFT, checkCanMint } from './services/web3Service';
 
 export default function App() {
   const [stage, setStage] = useState<AppStage>(AppStage.LANDING);
@@ -20,10 +20,11 @@ export default function App() {
   // Local Web3 State
   const [address, setAddress] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
+  const [hasMinted, setHasMinted] = useState(false);
   
   // Mock Data
   const totalMinted = "4050";
-  const totalCount = "8004";
+  const totalCount = "5555";
 
   // Mint threshold constant
   const MINT_THRESHOLD = 300;
@@ -35,7 +36,7 @@ export default function App() {
 
   const handleScoreUpdate = (newScore: number) => {
     setScore(newScore);
-    if (newScore >= MINT_THRESHOLD && stage === AppStage.GAME) {
+    if (newScore >= MINT_THRESHOLD && stage === AppStage.GAME && !hasMinted) {
         setStage(AppStage.MINT_PROMPT);
     }
   };
@@ -45,6 +46,14 @@ export default function App() {
     try {
       const addr = await connectWallet();
       setAddress(addr);
+      if (addr) {
+          const canMint = await checkCanMint(addr);
+          // If they CAN mint, it means they haven't minted yet.
+          // If they CANNOT mint (checkCanMint returns false), it implies they HAVE minted (or other error).
+          // checkCanMint returns !hasMinted.
+          // So hasMinted = !canMint.
+          setHasMinted(!canMint);
+      }
       return addr;
     } catch (e) {
       console.error("Connection failed", e);
@@ -154,6 +163,7 @@ export default function App() {
     try {
       const result = await mintNFT(score, address);
       if (result.success) {
+        setHasMinted(true);
         setStage(AppStage.MINT_SUCCESS);
       } else {
         alert(result.error || "Minting failed.");
@@ -401,7 +411,7 @@ export default function App() {
                     
                     <h2 className="text-2xl font-bold text-white mb-2 tracking-tighter">PROOF ACQUIRED</h2>
                     <p className="text-gray-400 mb-8 text-sm leading-relaxed">
-                        You have successfully minted the <span className="text-white">8004 Runner</span> participation token. 
+                        You have successfully minted the <span className="text-white">8004 Arcade</span> participation token. 
                         The system acknowledges your effort.
                     </p>
 

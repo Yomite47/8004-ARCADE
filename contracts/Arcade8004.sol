@@ -25,6 +25,8 @@ contract Arcade8004 is ERC721, Ownable {
 
     // Mint price (~$5 equivalent)
     uint256 public constant MINT_PRICE = 0.002 ether;
+    // Max supply cap
+    uint256 public constant MAX_SUPPLY = 5555;
 
     event NFTMinted(address indexed player, uint256 tokenId);
     event GameAgentUpdated(address indexed newAgent);
@@ -42,6 +44,7 @@ contract Arcade8004 is ERC721, Ownable {
      * @param signature The cryptographic signature from the game agent
      */
     function mint(bytes calldata signature) external payable {
+        require(_tokenIds < MAX_SUPPLY, "Max supply reached");
         require(!hasMinted[msg.sender], "Wallet has already minted an NFT");
         require(msg.value >= MINT_PRICE, "Insufficient ETH sent (0.002 ETH required)");
         
