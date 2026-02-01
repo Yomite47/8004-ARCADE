@@ -152,7 +152,7 @@ export const HeroSection: React.FC<SectionProps> = ({
               <div className="flex items-center gap-4 text-sm text-gray-300 font-mono">
                 <div className="flex items-center gap-2">
                   <span className="w-1 h-1 bg-green-400 rounded-full"></span>
-                  4 Protocols Active
+                  3 Protocols Active
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
@@ -199,17 +199,6 @@ export const HeroSection: React.FC<SectionProps> = ({
             />
 
             <GameCard 
-              title="Virus Whack"
-              description="Rapid response threat elimination. Whack the malicious nodes."
-              icon={<Ghost size={24} />}
-              accentColor="text-red-400"
-              borderColor="border-red-500/30"
-              onClick={onPlayVirusWhack}
-              isWalletConnected={isWalletConnected}
-              status="LIVE"
-            />
-
-            <GameCard 
               title="Cyber Flight"
               description="Aerial navigation through secure pipes. Maintain altitude."
               icon={<Rocket size={24} />}
@@ -218,6 +207,17 @@ export const HeroSection: React.FC<SectionProps> = ({
               onClick={onPlayCyberFlap}
               isWalletConnected={isWalletConnected}
               status="LIVE"
+            />
+
+            <GameCard 
+              title="Virus Whack"
+              description="Rapid response threat elimination. Whack the malicious nodes."
+              icon={<Ghost size={24} />}
+              accentColor="text-red-400"
+              borderColor="border-red-500/30"
+              onClick={onPlayVirusWhack}
+              isWalletConnected={isWalletConnected}
+              status="COMING SOON"
             />
 
             <GameCard 
