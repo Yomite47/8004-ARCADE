@@ -261,6 +261,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
       if (obs.x + obs.width < 0) {
         obstacles.splice(i, 1);
       }
+    }
 
       // Draw Ground Line
       ctx.beginPath();
