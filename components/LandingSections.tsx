@@ -195,33 +195,22 @@ export const HeroSection: React.FC<SectionProps> = ({
               borderColor="border-green-500/30"
               onClick={onPlaySnake}
               isWalletConnected={isWalletConnected}
-              status="LIVE"
-            />
-
-            <GameCard 
-              title="Block Breaker"
-              description="Cryptographic firewall penetration. Shatter defenses to access the core."
-              icon={<Grid size={24} />}
-              accentColor="text-blue-400"
-              borderColor="border-blue-500/30"
-              onClick={onPlayBlockBreaker}
-              isWalletConnected={isWalletConnected}
-              status="LIVE"
+              status="COMING SOON"
             />
 
             <GameCard 
               title="System Defense"
-              description="Protect the mainframe from external viral vectors. Precision required."
+              description="Protect the core from incoming projectiles. Do not let defenses fall."
               icon={<Shield size={24} />}
-              accentColor="text-purple-400"
-              borderColor="border-purple-500/30"
+              accentColor="text-blue-400"
+              borderColor="border-blue-500/30"
               onClick={onPlaySpaceInvaders}
               isWalletConnected={isWalletConnected}
-              status="LIVE"
+              status="COMING SOON"
             />
 
             <GameCard 
-              title="Virus Purge"
+              title="Virus Whack"
               description="Rapid response threat elimination. Whack the malicious nodes."
               icon={<Ghost size={24} />}
               accentColor="text-red-400"

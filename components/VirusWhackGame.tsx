@@ -77,7 +77,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
 
     // Game Loop
     const loop = (timestamp: number) => {
-      if (gameState !== 'PLAYING') {
+      if (gameStateRef.current !== 'PLAYING') {
          draw();
          gameLoopRef.current = requestAnimationFrame(loop);
          return;
