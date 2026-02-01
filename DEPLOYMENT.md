@@ -49,6 +49,17 @@ You can easily use your own domain (e.g., `www.yourgame.com`):
 
 Your game code is already compatible with any domain!
 
+## 6. Fund Management (Withdrawal)
+Since this is a paid mint, the contract will accumulate ETH. To withdraw funds:
+
+1.  Ensure your `.env` file has the correct `PRIVATE_KEY` (must be the deployer/owner wallet).
+2.  Run the withdrawal script:
+    ```bash
+    npx hardhat run scripts/withdraw.js --network sepolia
+    ```
+    *(Replace `sepolia` with `mainnet` or `base` when you launch on mainnet)*
+3.  The script will check the balance and transfer all funds to the deployer's wallet.
+
 ## Local Development
 To run everything locally with the new setup:
 
