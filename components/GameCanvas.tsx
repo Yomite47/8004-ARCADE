@@ -251,15 +251,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
           return; // Stop loop
         }
 
-        // Scoring (distance based, simplified to per frame roughly)
-        if (obs.x + obs.width < 0) {
-          obstacles.splice(i, 1);
-        }
+        // Scoring (1 point per obstacle passed)
+      if (obs.x + obs.width < runner.x && !obs.passed) {
+          obs.passed = true;
+          scoreRef.current += 1;
+          onScoreUpdate(Math.floor(scoreRef.current));
       }
 
-      // Update Score
-      scoreRef.current += speedRef.current * 0.05;
-      onScoreUpdate(Math.floor(scoreRef.current));
+      if (obs.x + obs.width < 0) {
+        obstacles.splice(i, 1);
+      }
 
       // Draw Ground Line
       ctx.beginPath();

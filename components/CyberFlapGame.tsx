@@ -175,7 +175,7 @@ export const CyberFlapGame: React.FC<CyberFlapGameProps> = ({ onGameOver, onScor
           // Score Update
           if (!pipe.passed && pipe.x + PIPE_WIDTH < bx - br) {
               pipe.passed = true;
-              scoreRef.current += 20;
+              scoreRef.current += 1;
               onScoreUpdate(scoreRef.current);
           }
       });

@@ -40,7 +40,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     virusesRef.current = [];
     spawnIntervalRef.current = 1500;
     gameStartTimeRef.current = performance.now();
-    lastSpawnTimeRef.current = performance.now();
+    lastSpawnTimeRef.current = 0; // Spawn immediately
   };
 
   useEffect(() => {
@@ -165,7 +165,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
       if (hitIndex !== -1) {
           // Hit!
           virusesRef.current.splice(hitIndex, 1);
-          scoreRef.current += 5;
+          scoreRef.current += 1;
           onScoreUpdate(scoreRef.current);
       }
   };

@@ -29,12 +29,12 @@ export default function App() {
   // Mint threshold constant
   const getMintThreshold = (game: 'RUNNER' | 'SNAKE' | 'BLOCK_BREAKER' | 'SPACE_INVADERS' | 'VIRUS_WHACK' | 'CYBER_FLAP') => {
     switch (game) {
-        case 'RUNNER': return 1000;
-        case 'VIRUS_WHACK': return 500;
-        case 'CYBER_FLAP': return 500;
+        case 'RUNNER': return 20;
+        case 'VIRUS_WHACK': return 20;
+        case 'CYBER_FLAP': return 20;
+        case 'BLOCK_BREAKER': return 600; // Clear all blocks (approx 600-700 pts)
         case 'SNAKE': return 500;
         case 'SPACE_INVADERS': return 1000;
-        case 'BLOCK_BREAKER': return 1000;
         default: return 500;
     }
   };
