@@ -14,6 +14,15 @@ interface Virus {
   type: 'VIRUS' | 'glitch';
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  color: string;
+}
+
 export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lives, setLives] = useState(3);
@@ -24,6 +33,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
   const virusesRef = useRef<Virus[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
   const gameLoopRef = useRef<number | null>(null);
   const lastSpawnTimeRef = useRef(0);
   const spawnIntervalRef = useRef(1500); // ms
@@ -39,6 +49,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     setLives(3);
     onScoreUpdate(0);
     virusesRef.current = [];
+    particlesRef.current = [];
     spawnIntervalRef.current = 1500;
     gameStartTimeRef.current = performance.now();
     lastSpawnTimeRef.current = 0; // Spawn immediately
@@ -53,28 +64,24 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     
     initGame();
 
-    // Input Handling (Mouse/Touch)
-    const handleInput = (e: MouseEvent | TouchEvent) => {
+    // Input Handling (Pointer Events for Mouse + Touch)
+    const handleInput = (e: PointerEvent) => {
+        // Only handle primary clicks/touches
+        if (!e.isPrimary) return;
+
         const rect = canvas.getBoundingClientRect();
-        let clientX, clientY;
-
-        if (e instanceof MouseEvent) {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        } else {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-            e.preventDefault(); // Prevent scrolling
-        }
-
+        const clientX = e.clientX;
+        const clientY = e.clientY;
+        
         const x = clientX - rect.left;
         const y = clientY - rect.top;
         
         checkHit(x, y, canvas.width, canvas.height);
     };
 
-    canvas.addEventListener('mousedown', handleInput);
-    canvas.addEventListener('touchstart', handleInput, { passive: false });
+    canvas.addEventListener('pointerdown', handleInput);
+    // Prevent default touch actions to stop zooming/scrolling while playing
+    canvas.style.touchAction = 'none';
 
     // Game Loop
     const loop = (timestamp: number) => {
@@ -95,8 +102,8 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     gameLoopRef.current = requestAnimationFrame(loop);
 
     return () => {
-      canvas.removeEventListener('mousedown', handleInput);
-      canvas.removeEventListener('touchstart', handleInput);
+      canvas.removeEventListener('pointerdown', handleInput);
+      canvas.style.touchAction = 'auto';
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
   }, []);
@@ -120,7 +127,30 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     });
   };
 
+  const createExplosion = (x: number, y: number, color: string) => {
+    for (let i = 0; i < 8; i++) {
+        const angle = (Math.PI * 2 * i) / 8;
+        const speed = 2 + Math.random() * 2;
+        particlesRef.current.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1.0,
+            color
+        });
+    }
+  };
+
   const update = (timestamp: number) => {
+    // Update Particles
+    particlesRef.current.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.05;
+    });
+    particlesRef.current = particlesRef.current.filter(p => p.life > 0);
+
     // Spawning
     if (timestamp - lastSpawnTimeRef.current > spawnIntervalRef.current) {
         spawnVirus(timestamp);
@@ -165,6 +195,12 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
 
       if (hitIndex !== -1) {
           // Hit!
+          const virus = virusesRef.current[hitIndex];
+          const vx = CELL_PADDING + virus.col * (cellWidth + CELL_PADDING) + cellWidth/2;
+          const vy = CELL_PADDING + virus.row * (cellHeight + CELL_PADDING) + cellHeight/2;
+          
+          createExplosion(vx, vy, '#ff003c');
+          
           virusesRef.current.splice(hitIndex, 1);
           scoreRef.current += 1;
           onScoreUpdate(scoreRef.current);
@@ -235,6 +271,16 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
         ctx.stroke();
     });
     
+    // Draw Particles
+    particlesRef.current.forEach(p => {
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    });
+    
     // Reset shadow
     ctx.shadowBlur = 0;
   };
@@ -264,6 +310,9 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
         )}
       </div>
       <div className="absolute top-4 right-4 flex gap-2">
+        <div className="text-[#ff003c] font-mono text-lg font-bold mr-4 animate-pulse">
+            GOAL: 20
+        </div>
         {[...Array(3)].map((_, i) => (
             <div key={i} className={`w-4 h-4 rounded-full ${i < lives ? 'bg-green-500 shadow-[0_0_10px_#00ff00]' : 'bg-gray-800'}`} />
         ))}
