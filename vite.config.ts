@@ -6,8 +6,15 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       server: {
-        port: 3000,
+        port: 3001,
         host: '0.0.0.0',
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000', // Forward API requests to the local Vercel dev server (usually 3000) or separate backend
+                changeOrigin: true,
+                secure: false,
+            }
+        }
       },
       plugins: [react()],
       define: {

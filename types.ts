@@ -2,6 +2,7 @@ export enum AppStage {
   LANDING = 'LANDING',
   GAME = 'GAME',
   GAME_OVER = 'GAME_OVER',
+  MINT_PROMPT = 'MINT_PROMPT',
   MINT_SUCCESS = 'MINT_SUCCESS',
 }
 
@@ -19,8 +20,10 @@ export interface RunnerEntity {
   y: number;
   width: number;
   height: number;
+  originalHeight?: number; // Optional for ducking mechanics
   vy: number;
   isGrounded: boolean;
+  isDucking?: boolean; // Optional state
   color: string;
 }
 

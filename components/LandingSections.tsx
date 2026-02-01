@@ -1,61 +1,330 @@
 import React from 'react';
 import { Button } from './Button';
-import { Cpu, Play, Skull, Trophy, Wallet, ArrowRight, Github, Twitter, Disc, Loader2 } from 'lucide-react';
+import { 
+  Cpu, Play, Skull, Trophy, Wallet, ArrowRight, Github, Twitter, Disc, Loader2,
+  Zap, GitCommit, Grid, Shield, Rocket, Ghost, CheckCircle, Brain, Lock
+} from 'lucide-react';
+
+interface GameCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  accentColor: string;
+  borderColor: string;
+  onClick: () => void;
+  isWalletConnected: boolean;
+  status: 'LIVE' | 'COMING SOON';
+}
+
+const GameCard: React.FC<GameCardProps> = ({ title, description, icon, accentColor, borderColor, onClick, isWalletConnected, status }) => (
+  <button 
+    onClick={onClick}
+    disabled={status === 'COMING SOON'}
+    className={`
+      group relative flex flex-col items-start text-left p-6 gap-4
+      bg-[#0a0a0a] border border-white/10
+      hover:border-white/30 transition-all duration-300
+      w-full rounded-xl overflow-hidden
+      ${status === 'COMING SOON' ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-1 hover:shadow-xl'}
+    `}
+  >
+    {/* Status Badge */}
+    <div className={`
+      absolute top-4 right-4 text-[10px] tracking-widest font-mono uppercase px-2 py-1 rounded-full border
+      ${status === 'LIVE' 
+        ? 'bg-green-500/10 text-green-400 border-green-500/20' 
+        : 'bg-gray-500/10 text-gray-400 border-gray-500/20'}
+    `}>
+      {status}
+    </div>
+
+    {/* Icon */}
+    <div className={`
+      p-3 rounded-lg bg-white/5 border border-white/10 
+      ${accentColor} transition-transform duration-500 group-hover:scale-110
+    `}>
+      {icon}
+    </div>
+
+    {/* Content */}
+    <div>
+      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+      <p className="text-sm text-gray-400 leading-relaxed">
+        {description}
+      </p>
+    </div>
+
+    {/* Action */}
+    <div className={`mt-auto pt-4 flex items-center gap-2 text-xs font-mono uppercase tracking-widest ${accentColor} opacity-80 group-hover:opacity-100`}>
+      {status === 'LIVE' ? (
+        <>
+          {isWalletConnected ? 'INITIATE RUN' : 'CONNECT SYSTEM'} 
+          <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform"/>
+        </>
+      ) : (
+        'LOCKED'
+      )}
+    </div>
+  </button>
+);
 
 interface SectionProps {
-  onPlayClick: () => void;
+  onPlayRunner: () => void;
+  onPlaySnake: () => void;
+  onPlayBlockBreaker: () => void;
+  onPlaySpaceInvaders: () => void;
+  onPlayVirusWhack: () => void;
+  onPlayCyberFlap: () => void;
   isWalletConnected: boolean;
 }
 
-export const HeroSection: React.FC<SectionProps> = ({ onPlayClick, isWalletConnected }) => {
+export const HeroSection: React.FC<SectionProps> = ({ 
+  onPlayRunner, onPlaySnake, onPlayBlockBreaker, onPlaySpaceInvaders, onPlayVirusWhack, onPlayCyberFlap, 
+  isWalletConnected 
+}) => {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center text-center p-6 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 cyber-grid opacity-30 z-0"></div>
-      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#050505] to-transparent z-10"></div>
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-white/20">
       
-      {/* Content */}
-      <div className="relative z-20 max-w-4xl mx-auto mt-16">
-        <div className="inline-block px-3 py-1 mb-6 border border-green-500/30 bg-green-900/10 text-green-400 text-xs tracking-[0.2em] uppercase rounded-full animate-pulse">
-          System Breach Detected: Block 8004
+      {/* Navbar */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="font-bold tracking-tight text-lg">8004 ARCADE</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-gray-400">
+            <a href="#games" className="hover:text-white transition-colors">Protocols</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
+            <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono">
+              v1.0.4
+            </div>
+          </div>
         </div>
-        
-        <h1 
-          className="text-6xl md:text-8xl font-bold tracking-tighter text-white mb-6 glitch-text"
-          data-text="8004 RUNNER"
-        >
-          8004 RUNNER
-        </h1>
-        
-        <p className="text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-          Survive the <span className="text-white neon-glow">digital desert</span>. 
-          Reclaim lost data fragments. <br className="hidden md:block"/>
-          Earn your place in the chain.
-        </p>
+      </nav>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-          <Button 
-            onClick={onPlayClick} 
-            className="w-full sm:w-auto min-w-[220px] h-14 text-lg border-2 border-white hover:border-transparent"
-          >
-            {isWalletConnected ? (
-                <>ENTER SYSTEM <Play size={20} className="ml-2" /></>
-            ) : (
-                <>INITIALIZE RUN <Wallet size={20} className="ml-2" /></>
-            )}
-          </Button>
+      {/* Main Content */}
+      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="grid md:grid-cols-2 gap-12 items-center mb-32">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+              ERC-8004 · Trustless Game Agents
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+              Prove Skill. <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+                Mint Authority.
+              </span>
+            </h1>
+            
+            <p className="text-xl text-gray-400 max-w-lg leading-relaxed">
+              8004 Arcade is a permissionless platform where AI agents evaluate player performance and authorize on-chain token mints.
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+               <a href="#games" className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                 Start Challenge <ArrowRight size={18} />
+               </a>
+               <button className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5 transition-colors text-gray-300">
+                 Read Documentation
+               </button>
+            </div>
+          </div>
+
+          {/* Featured Card / "Next Chapter" Style */}
+          <div className="relative">
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-xl p-8 overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Trophy size={100} />
+              </div>
+              
+              <div className="text-sm text-gray-500 font-mono mb-2">CURRENT SEASON</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Genesis Block</h3>
+              <p className="text-gray-400 mb-6">
+                The first story has been told. Now, a new challenge emerges from the void. 
+                Are you ready to prove yourself?
+              </p>
+              
+              <div className="flex items-center gap-4 text-sm text-gray-300 font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="w-1 h-1 bg-green-400 rounded-full"></span>
+                  6 Protocols Active
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                  Minting Live
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Games Grid Section */}
+        <div id="games" className="mb-32">
+          <div className="flex items-end justify-between mb-12 border-b border-white/10 pb-6">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Active Protocols</h2>
+              <p className="text-gray-400">Select a simulation to begin evaluation.</p>
+            </div>
+            <div className="hidden md:block text-sm text-gray-500 font-mono">
+              SYSTEM_READY
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <GameCard 
+              title="8004 Runner"
+              description="High-velocity traversal simulation. Avoid digital obstacles and maintain momentum."
+              icon={<Zap size={24} />}
+              accentColor="text-yellow-400"
+              borderColor="border-yellow-500/30"
+              onClick={onPlayRunner}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+            
+            <GameCard 
+              title="Neural Snake"
+              description="Data consumption algorithm. Grow the network without self-termination."
+              icon={<GitCommit size={24} />}
+              accentColor="text-green-400"
+              borderColor="border-green-500/30"
+              onClick={onPlaySnake}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+
+            <GameCard 
+              title="Block Breaker"
+              description="Cryptographic firewall penetration. Shatter defenses to access the core."
+              icon={<Grid size={24} />}
+              accentColor="text-blue-400"
+              borderColor="border-blue-500/30"
+              onClick={onPlayBlockBreaker}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+
+            <GameCard 
+              title="System Defense"
+              description="Protect the mainframe from external viral vectors. Precision required."
+              icon={<Shield size={24} />}
+              accentColor="text-purple-400"
+              borderColor="border-purple-500/30"
+              onClick={onPlaySpaceInvaders}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+
+            <GameCard 
+              title="Virus Purge"
+              description="Rapid response threat elimination. Whack the malicious nodes."
+              icon={<Ghost size={24} />}
+              accentColor="text-red-400"
+              borderColor="border-red-500/30"
+              onClick={onPlayVirusWhack}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+
+            <GameCard 
+              title="Cyber Flight"
+              description="Aerial navigation through secure pipes. Maintain altitude."
+              icon={<Rocket size={24} />}
+              accentColor="text-cyan-400"
+              borderColor="border-cyan-500/30"
+              onClick={onPlayCyberFlap}
+              isWalletConnected={isWalletConnected}
+              status="LIVE"
+            />
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div id="about" className="grid md:grid-cols-3 gap-8 mb-32 border-t border-white/10 pt-20">
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white border border-white/10">
+              <Brain size={20} />
+            </div>
+            <h3 className="text-xl font-bold">Agent Evaluation</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              Autonomous AI agents monitor gameplay patterns to verify human skill. No centralized gatekeepers — just code.
+            </p>
+          </div>
           
-          <a href="#how-to-play" className="text-sm text-gray-500 hover:text-white uppercase tracking-widest transition-colors flex items-center gap-2 group">
-            Mission Briefing 
-            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform"/>
-          </a>
-        </div>
-      </div>
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white border border-white/10">
+              <Lock size={20} />
+            </div>
+            <h3 className="text-xl font-bold">On-Chain Proof</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              Every high score is cryptographically signed. Claim tokens only after passing the agent's criteria.
+            </p>
+          </div>
 
-      {/* Decorative floating elements */}
-      <div className="absolute top-1/4 left-10 w-2 h-2 bg-red-500 animate-ping"></div>
-      <div className="absolute bottom-1/3 right-20 w-1 h-1 bg-green-500 animate-ping delay-700"></div>
-    </section>
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white border border-white/10">
+              <CheckCircle size={20} />
+            </div>
+            <h3 className="text-xl font-bold">Reputation System</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              Built on ERC-8004. Build your on-chain resume as a certified operator across multiple protocols.
+            </p>
+          </div>
+        </div>
+
+        {/* How It Works */}
+        <div className="bg-[#0a0a0a] rounded-2xl p-8 md:p-12 border border-white/10">
+          <h2 className="text-2xl font-bold mb-12">Transmission Protocol</h2>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="relative">
+              <div className="text-6xl font-bold text-white/5 mb-4">01</div>
+              <h4 className="text-lg font-bold mb-2">Connect</h4>
+              <p className="text-sm text-gray-400">Link your Web3 identity to the arcade terminal.</p>
+            </div>
+            
+            <div className="relative">
+              <div className="text-6xl font-bold text-white/5 mb-4">02</div>
+              <h4 className="text-lg font-bold mb-2">Play</h4>
+              <p className="text-sm text-gray-400">Select a protocol and demonstrate your proficiency.</p>
+            </div>
+
+            <div className="relative">
+              <div className="text-6xl font-bold text-white/5 mb-4">03</div>
+              <h4 className="text-lg font-bold mb-2">Qualify</h4>
+              <p className="text-sm text-gray-400">Reach the score threshold (500) to trigger the agent.</p>
+            </div>
+
+            <div className="relative">
+              <div className="text-6xl font-bold text-white/5 mb-4">04</div>
+              <h4 className="text-lg font-bold mb-2">Mint</h4>
+              <p className="text-sm text-gray-400">Receive your signed proof and mint your token.</p>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 bg-[#020202] py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+            <span className="font-bold text-gray-400">8004 ARCADE</span>
+          </div>
+          <div className="flex gap-6 text-gray-500 text-sm">
+            <a href="#" className="hover:text-white">Twitter</a>
+            <a href="#" className="hover:text-white">Github</a>
+            <a href="#" className="hover:text-white">Etherscan</a>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
 
@@ -106,7 +375,7 @@ export const GameplaySection: React.FC = () => {
     {
       icon: <Trophy size={32} className="text-yellow-400" />,
       title: "Mint",
-      desc: "Score 200+ to unlock the participation proof NFT."
+      desc: "Surpass the hidden threshold to unlock the participation proof NFT."
     }
   ];
 
@@ -203,7 +472,7 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
             </p>
             <p>
               <strong className="text-white">No shortcuts. No whitelist.</strong><br/>
-              Reach <span className="text-white font-bold border-b border-green-500">200 points</span> in a single run to unlock the minting protocol.
+              Reach <span className="text-white font-bold border-b border-green-500">Threshold</span> in a single run to unlock the minting protocol.
             </p>
             <p className="text-sm border-l-2 border-red-500 pl-4 italic">
               *Limit one artifact per wallet per successful run.
@@ -217,11 +486,11 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
                 </Button>
             ) : canMint ? (
                 <Button onClick={onMint} isLoading={isMinting} className="w-full md:w-auto">
-                    MINT FRAGMENT
+                    MINT FRAGMENT (0.002 ETH)
                 </Button>
             ) : (
-                <div className="p-4 border border-red-900/50 bg-red-900/10 text-red-400 text-sm text-center">
-                    SCORE 200 REQUIRED TO UNLOCK
+                <div className="p-4 border border-red-900/50 bg-red-900/10 text-red-400 text-sm text-center animate-pulse">
+                    INSUFFICIENT DATA / ACCESS DENIED
                 </div>
             )}
           </div>

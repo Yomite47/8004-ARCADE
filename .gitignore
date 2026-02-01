@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment Variables
+.env
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# Assets (Optional: Ignore large files if needed)
+*.zip
+*.car

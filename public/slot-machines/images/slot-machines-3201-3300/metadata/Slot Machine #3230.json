@@ -1,0 +1,51 @@
+{
+  "name": "Slot Machine #3230",
+  "description": "5555 Ochain Slot Machines",
+  "external_url": "",
+  "image": "slot-machine-#3230.png",
+  "attributes": [
+    {
+      "trait_type": "BG Color",
+      "value": "1000452601"
+    },
+    {
+      "trait_type": "Alarm",
+      "value": "1000452593"
+    },
+    {
+      "trait_type": "Body",
+      "value": "1000452652"
+    },
+    {
+      "trait_type": "Handle",
+      "value": "1000452678"
+    },
+    {
+      "trait_type": "Buttons",
+      "value": "1000452648"
+    },
+    {
+      "trait_type": "Display",
+      "value": "1000452670"
+    },
+    {
+      "trait_type": "Side Panel",
+      "value": "1000452667"
+    },
+    {
+      "trait_type": "Top Display",
+      "value": "1000452628"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "slot-machine-#3230.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": []
+  },
+  "compiler": "NFTexport.io"
+}

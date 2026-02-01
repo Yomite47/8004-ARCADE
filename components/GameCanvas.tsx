@@ -17,33 +17,41 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
     y: 0, // Set in init
     width: 30,
     height: 50,
+    originalHeight: 50, // Store original height for uncrouching
     vy: 0,
     isGrounded: true,
+    isDucking: false,
     color: '#ffffff'
   });
   
   const obstaclesRef = useRef<ObstacleEntity[]>([]);
   const particlesRef = useRef<Particle[]>([]);
-  const speedRef = useRef<number>(6);
+  const speedRef = useRef<number>(2);
   const framesRef = useRef<number>(0);
 
   const config: GameConfig = {
-    gravity: 0.8,
-    jumpStrength: -14,
+    gravity: 0.6, // Reduced from 0.8 for floatier jumps
+    jumpStrength: -15, // Adjusted from -16
     groundY: 300,
-    gameSpeedStart: 6,
+    gameSpeedStart: 2,
     gameSpeedMax: 15,
     acceleration: 0.001,
   };
 
   const spawnObstacle = (canvasWidth: number) => {
-    const minHeight = 30;
-    const maxHeight = 70;
+    const minHeight = 20;
+    const maxHeight = 50;
     const height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
-    const width = 30 + Math.random() * 20;
+    const width = 20 + Math.random() * 20;
     
-    // 10% chance for a "glitch" obstacle (floating)
-    const isGlitch = Math.random() > 0.9;
+    // 15% chance for a "glitch" obstacle (floating) - Increased from 10%
+    const isGlitch = Math.random() > 0.85;
+    
+    // Ensure flying obstacles are high enough to duck under
+    // Gap needs to be > ducked height (25px) but < standing height (50px)
+    // Gap of 40px: ObsBottom = Ground-40. Standing Head = Ground-50. 
+    // Standing: Head(G-50) < Bottom(G-40) -> TRUE (Collision)
+    // Ducking: Head(G-25) < Bottom(G-40) -> FALSE (No Collision)
     const y = isGlitch ? config.groundY - height - 40 : config.groundY - height;
 
     obstaclesRef.current.push({
@@ -98,11 +106,28 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
     // Input Handling
     const jump = () => {
       const runner = runnerRef.current;
-      if (runner.isGrounded) {
+      if (runner.isGrounded && !runner.isDucking) {
         runner.vy = config.jumpStrength;
         runner.isGrounded = false;
         createParticles(runner.x + runner.width / 2, runner.y + runner.height, '#ffffff', 5);
       }
+    };
+
+    const duck = (isDown: boolean) => {
+        const runner = runnerRef.current;
+        if (isDown) {
+            if (!runner.isDucking) {
+                runner.isDucking = true;
+                runner.height = runner.originalHeight ? runner.originalHeight / 2 : 25;
+                runner.y += runner.height; // Push down instantly so we don't float
+            }
+        } else {
+            if (runner.isDucking) {
+                runner.isDucking = false;
+                runner.y -= runner.height; // Pop up
+                runner.height = runner.originalHeight || 50;
+            }
+        }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -110,10 +135,23 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
         e.preventDefault();
         jump();
       }
+      if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+        e.preventDefault();
+        duck(true);
+      }
     };
 
-    const handleTouch = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scroll
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+            e.preventDefault();
+            duck(false);
+        }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault(); 
+      // Simple touch logic: Top half jump, bottom half duck? 
+      // For now, just jump on tap as before, maybe add swipe later or buttons
       jump();
     };
     
@@ -123,7 +161,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    window.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('mousedown', handleMouse);
 
     // Main Game Loop
@@ -193,12 +232,18 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
         ctx.fillRect(obs.x, obs.y + obs.height/2, obs.width, 2);
 
 
-        // Collision Detection
+        // Collision Detection (Forgiving Hitbox)
+        // Shrink runner hitbox slightly to make it fair
+        const hitX = runner.x + 5;
+        const hitY = runner.y + 5;
+        const hitW = runner.width - 10;
+        const hitH = runner.height - 10;
+
         if (
-          runner.x < obs.x + obs.width &&
-          runner.x + runner.width > obs.x &&
-          runner.y < obs.y + obs.height &&
-          runner.y + runner.height > obs.y
+          hitX < obs.x + obs.width &&
+          hitX + hitW > obs.x &&
+          hitY < obs.y + obs.height &&
+          hitY + hitH > obs.y
         ) {
           // Collision!
           createParticles(runner.x + runner.width/2, runner.y + runner.height/2, '#ff0000', 20);
@@ -263,8 +308,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('resize', handleResize);
-      canvas.removeEventListener('touchstart', handleTouch);
+      window.removeEventListener('keyup', handleKeyUp);
+      canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('mousedown', handleMouse);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
@@ -273,8 +318,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ onGameOver, onScoreUpdat
   return (
     <div className="relative w-full h-[400px] bg-black border-y border-gray-800 overflow-hidden">
         <canvas ref={canvasRef} className="block w-full h-full cursor-pointer" />
-        <div className="absolute top-4 right-4 text-xs text-gray-500 uppercase tracking-widest pointer-events-none">
-            System Status: Active
+        <div className="absolute top-4 right-4 text-xs text-gray-500 uppercase tracking-widest pointer-events-none text-right">
+            <div>System Status: Active</div>
+            <div className="mt-1 text-[10px] opacity-70">JUMP [SPACE] • DUCK [DOWN]</div>
         </div>
     </div>
   );
