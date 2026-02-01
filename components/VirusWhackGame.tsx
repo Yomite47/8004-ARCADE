@@ -18,6 +18,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lives, setLives] = useState(3);
   const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
+  const gameStateRef = useRef<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State
   const scoreRef = useRef(0);

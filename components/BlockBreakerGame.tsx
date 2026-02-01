@@ -41,8 +41,8 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
   const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State Refs
-  const ballRef = useRef<Ball>({ x: 0, y: 0, dx: 0, dy: 0, radius: 6, speed: 2.5 });
-  const paddleRef = useRef<Paddle>({ x: 0, y: 0, width: 100, height: 15, color: '#00f3ff', speed: 6 });
+  const ballRef = useRef<Ball>({ x: 0, y: 0, dx: 0, dy: 0, radius: 6, speed: 2.0 });
+  const paddleRef = useRef<Paddle>({ x: 0, y: 0, width: 100, height: 15, color: '#00f3ff', speed: 5 });
   const blocksRef = useRef<Block[]>([]);
   const scoreRef = useRef<number>(0);
   const gameLoopRef = useRef<number | null>(null);
@@ -85,8 +85,8 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
   const resetBall = (canvas: HTMLCanvasElement) => {
     ballRef.current.x = canvas.width / 2;
     ballRef.current.y = canvas.height - PADDLE_BOTTOM_MARGIN - 20;
-    ballRef.current.speed = 2.5;
-    ballRef.current.dx = 2 * (Math.random() > 0.5 ? 1 : -1);
+    ballRef.current.speed = 2.0;
+    ballRef.current.dx = 1.6 * (Math.random() > 0.5 ? 1 : -1);
     ballRef.current.dy = -ballRef.current.speed;
   };
 
