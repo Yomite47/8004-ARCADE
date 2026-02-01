@@ -38,10 +38,11 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State Refs
-  const ballRef = useRef<Ball>({ x: 0, y: 0, dx: 0, dy: 0, radius: 6, speed: 3.5 });
-  const paddleRef = useRef<Paddle>({ x: 0, y: 0, width: 100, height: 15, color: '#00f3ff', speed: 8 });
+  const ballRef = useRef<Ball>({ x: 0, y: 0, dx: 0, dy: 0, radius: 6, speed: 2.5 });
+  const paddleRef = useRef<Paddle>({ x: 0, y: 0, width: 100, height: 15, color: '#00f3ff', speed: 6 });
   const blocksRef = useRef<Block[]>([]);
   const scoreRef = useRef<number>(0);
   const gameLoopRef = useRef<number | null>(null);
@@ -84,9 +85,9 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
   const resetBall = (canvas: HTMLCanvasElement) => {
     ballRef.current.x = canvas.width / 2;
     ballRef.current.y = canvas.height - PADDLE_BOTTOM_MARGIN - 20;
-    ballRef.current.dx = 2 * (Math.random() > 0.5 ? 1 : -1);
-    ballRef.current.dy = -2.5;
     ballRef.current.speed = 2.5;
+    ballRef.current.dx = 2 * (Math.random() > 0.5 ? 1 : -1);
+    ballRef.current.dy = -ballRef.current.speed;
   };
 
   const createBlocks = (canvas: HTMLCanvasElement) => {
@@ -284,24 +285,40 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
     ctx.closePath();
   };
 
+  const startGame = () => {
+    setGameState('PLAYING');
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-black/90">
-      <canvas
-        ref={canvasRef}
-        className="border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)] max-w-full"
-      />
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          className="border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)] max-w-full"
+          onClick={gameState === 'START' ? startGame : undefined}
+        />
+        {gameState === 'START' && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center bg-black/60 cursor-pointer"
+            onClick={startGame}
+            onTouchEnd={(e) => { e.preventDefault(); startGame(); }}
+          >
+            <div className="text-[#00f3ff] font-mono text-2xl animate-pulse">TAP TO START</div>
+          </div>
+        )}
+      </div>
       <div className="mt-4 text-gray-500 text-sm">
         Use Left/Right Arrows or Touch Controls to Move
       </div>
       
       {/* Mobile Controls */}
-      <div className="flex gap-4 mt-4">
+      <div className="flex gap-8 mt-6">
         <button 
           onMouseDown={() => handleTouchDirection('left')}
           onMouseUp={() => handleTouchDirection('stop')}
           onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('left'); }}
           onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
-          className="p-4 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
         >
           <ArrowLeft size={32} className="text-white" />
         </button>
@@ -310,7 +327,7 @@ export const BlockBreakerGame: React.FC<BlockBreakerGameProps> = ({ onGameOver, 
           onMouseUp={() => handleTouchDirection('stop')}
           onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('right'); }}
           onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
-          className="p-4 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
         >
           <ArrowRight size={32} className="text-white" />
         </button>

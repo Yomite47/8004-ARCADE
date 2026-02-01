@@ -14,6 +14,8 @@ interface Point {
 export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
+  const gameStateRef = useRef<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State Refs
   const snakeRef = useRef<Point[]>([{ x: 10, y: 10 }]);
@@ -27,7 +29,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate 
   // Config
   const GRID_SIZE = 20;
   const TILE_COUNT = 20; // Will be calculated based on canvas size
-  const SPEED = 10; // Snake moves per second
+  const SPEED = 7; // Snake moves per second
   
   const initGame = () => {
     snakeRef.current = [{ x: 10, y: 10 }];
@@ -66,7 +68,18 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    initGame();
+    // Only init game logic if playing, otherwise just draw start state
+    if (gameState === 'PLAYING') {
+      initGame();
+    } else {
+       spawnFood(); // Spawn once so we have something to draw
+       const ctx = canvas.getContext('2d');
+       if (ctx) {
+           // Draw initial black screen or static game state
+           ctx.fillStyle = '#000000';
+           ctx.fillRect(0, 0, canvas.width, canvas.height);
+       }
+    }
 
     // Input handling
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -90,6 +103,12 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate 
 
     // Game Loop
     const loop = (currentTime: number) => {
+      if (gameStateRef.current !== 'PLAYING') {
+        // Just keep the loop running to catch state changes, but don't update/draw game
+        gameLoopRef.current = requestAnimationFrame(loop);
+        return;
+      }
+
       if (isPaused) {
         gameLoopRef.current = requestAnimationFrame(loop);
         return;
@@ -210,43 +229,61 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({ onGameOver, onScoreUpdate 
     });
   };
 
+  const startGame = () => {
+    setGameState('PLAYING');
+    gameStateRef.current = 'PLAYING';
+    initGame();
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-black/90">
-      <canvas
-        ref={canvasRef}
-        className="border-2 border-white/20 shadow-[0_0_20px_rgba(0,243,255,0.2)] max-w-full"
-      />
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          className="border-2 border-white/20 shadow-[0_0_20px_rgba(0,243,255,0.2)] max-w-full"
+          onClick={gameState === 'START' ? startGame : undefined}
+        />
+        {gameState === 'START' && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center bg-black/60 cursor-pointer"
+            onClick={startGame}
+            onTouchEnd={(e) => { e.preventDefault(); startGame(); }}
+          >
+            <div className="text-[#00f3ff] font-mono text-2xl animate-pulse">TAP TO START</div>
+          </div>
+        )}
+      </div>
       <div className="mt-4 text-gray-500 text-sm">
         Use Arrow Keys or Touch Controls to Move
       </div>
 
       {/* Mobile Controls */}
-      <div className="flex flex-col items-center gap-2 mt-4">
+      <div className="flex flex-col items-center gap-4 mt-6">
         <button 
           onClick={() => handleTouchDirection({ x: 0, y: -1 })} 
-          className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
         >
-          <ArrowUp size={24} className="text-white" />
+          <ArrowUp size={32} className="text-white" />
         </button>
-        <div className="flex gap-4">
+        <div className="flex gap-8">
           <button 
             onClick={() => handleTouchDirection({ x: -1, y: 0 })} 
-            className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+            className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
           >
-            <ArrowLeft size={24} className="text-white" />
+            <ArrowLeft size={32} className="text-white" />
           </button>
           <button 
             onClick={() => handleTouchDirection({ x: 1, y: 0 })} 
-            className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+            className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
           >
-            <ArrowRight size={24} className="text-white" />
+            <ArrowRight size={32} className="text-white" />
           </button>
         </div>
         <button 
           onClick={() => handleTouchDirection({ x: 0, y: 1 })} 
-          className="p-3 bg-white/10 rounded-full active:bg-white/30 transition-colors"
+          className="p-6 bg-white/10 rounded-full active:bg-white/30 transition-colors"
         >
-          <ArrowDown size={24} className="text-white" />
+          <ArrowDown size={32} className="text-white" />
         </button>
       </div>
     </div>

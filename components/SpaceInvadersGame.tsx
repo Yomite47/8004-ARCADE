@@ -31,14 +31,16 @@ import { ArrowLeft, ArrowRight, Crosshair } from 'lucide-react';
 export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
+  const gameStateRef = useRef<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State Refs
-  const playerRef = useRef<GameObject>({ x: 0, y: 0, width: 30, height: 20, color: '#00ff00', speed: 5 });
+  const playerRef = useRef<GameObject>({ x: 0, y: 0, width: 30, height: 20, color: '#00ff00', speed: 4 });
   const bulletsRef = useRef<Bullet[]>([]);
   const enemiesRef = useRef<Enemy[]>([]);
   const enemyDirectionRef = useRef<number>(1); // 1 for right, -1 for left
   const enemyMoveTimerRef = useRef<number>(0);
-  const enemyMoveIntervalRef = useRef<number>(50); // Frames between enemy moves (decreases as they get faster)
+  const enemyMoveIntervalRef = useRef<number>(80); // Frames between enemy moves (decreases as they get faster)
   
   const scoreRef = useRef<number>(0);
   const gameLoopRef = useRef<number | null>(null);
@@ -77,7 +79,7 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
     onScoreUpdate(0);
     bulletsRef.current = [];
     enemyDirectionRef.current = 1;
-    enemyMoveIntervalRef.current = 60; // Start slower
+    enemyMoveIntervalRef.current = 80; // Start slower
 
     // Init Player
     playerRef.current.x = canvas.width / 2 - playerRef.current.width / 2;
@@ -142,6 +144,12 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
 
     // Game Loop
     const loop = (timestamp: number) => {
+      if (gameStateRef.current !== 'PLAYING') {
+         draw();
+         gameLoopRef.current = requestAnimationFrame(loop);
+         return;
+      }
+
       if (isPaused) {
         gameLoopRef.current = requestAnimationFrame(loop);
         return;
@@ -169,7 +177,7 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
             width: 4,
             height: 10,
             color: '#ffffff',
-            speed: 7,
+            speed: 5,
             active: true,
             isPlayerBullet: true
         });
@@ -189,10 +197,8 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
         playerRef.current.x += playerRef.current.speed;
     }
 
-    // Shooting
-    if (spacePressed.current) {
-        shoot(timestamp);
-    }
+    // Auto Shooting
+    shoot(timestamp);
 
     // Enemy Shooting Logic
     // Chance to shoot based on enemy count (fewer enemies = more aggressive)
@@ -387,12 +393,30 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
     });
   };
 
+  const startGame = () => {
+    setGameState('PLAYING');
+    gameStateRef.current = 'PLAYING';
+    if (canvasRef.current) initGame(canvasRef.current);
+  };
+
   return (
     <div className="relative flex flex-col items-center">
-      <canvas 
-        ref={canvasRef} 
-        className="block bg-black border-2 border-green-500/50 rounded-lg shadow-[0_0_20px_rgba(0,255,0,0.3)] max-w-full"
-      />
+      <div className="relative">
+        <canvas 
+            ref={canvasRef} 
+            className="block bg-black border-2 border-green-500/50 rounded-lg shadow-[0_0_20px_rgba(0,255,0,0.3)] max-w-full"
+            onClick={gameState === 'START' ? startGame : undefined}
+        />
+        {gameState === 'START' && (
+            <div 
+                className="absolute inset-0 flex items-center justify-center bg-black/60 cursor-pointer rounded-lg"
+                onClick={startGame}
+                onTouchEnd={(e) => { e.preventDefault(); startGame(); }}
+            >
+                <div className="text-[#00ff00] font-mono text-2xl animate-pulse">TAP TO START</div>
+            </div>
+        )}
+      </div>
       {isPaused && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-mono text-2xl" style={{ maxHeight: '500px' }}>
           PAUSED
@@ -400,14 +424,14 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
       )}
 
       {/* Mobile Controls */}
-      <div className="flex gap-8 mt-4">
-        <div className="flex gap-4">
+      <div className="flex gap-8 mt-6">
+        <div className="flex gap-8">
           <button 
             onMouseDown={() => handleTouchDirection('left')}
             onMouseUp={() => handleTouchDirection('stop')}
             onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('left'); }}
             onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
-            className="p-4 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
+            className="p-6 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
           >
             <ArrowLeft size={32} className="text-green-400" />
           </button>
@@ -416,7 +440,7 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
             onMouseUp={() => handleTouchDirection('stop')}
             onTouchStart={(e) => { e.preventDefault(); handleTouchDirection('right'); }}
             onTouchEnd={(e) => { e.preventDefault(); handleTouchDirection('stop'); }}
-            className="p-4 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
+            className="p-6 bg-green-500/10 rounded-full active:bg-green-500/30 transition-colors border border-green-500/30"
           >
             <ArrowRight size={32} className="text-green-400" />
           </button>
@@ -427,7 +451,7 @@ export const SpaceInvadersGame: React.FC<SpaceInvadersGameProps> = ({ onGameOver
           onMouseUp={() => handleTouchFire(false)}
           onTouchStart={(e) => { e.preventDefault(); handleTouchFire(true); }}
           onTouchEnd={(e) => { e.preventDefault(); handleTouchFire(false); }}
-          className="p-4 bg-red-500/10 rounded-full active:bg-red-500/30 transition-colors border border-red-500/30"
+          className="p-6 bg-red-500/10 rounded-full active:bg-red-500/30 transition-colors border border-red-500/30"
         >
           <Crosshair size={32} className="text-red-400" />
         </button>

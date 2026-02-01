@@ -17,6 +17,7 @@ interface Virus {
 export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onScoreUpdate }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lives, setLives] = useState(3);
+  const [gameState, setGameState] = useState<'START' | 'PLAYING' | 'GAME_OVER'>('START');
   
   // Game State
   const scoreRef = useRef(0);
@@ -24,7 +25,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
   const virusesRef = useRef<Virus[]>([]);
   const gameLoopRef = useRef<number | null>(null);
   const lastSpawnTimeRef = useRef(0);
-  const spawnIntervalRef = useRef(1000); // ms
+  const spawnIntervalRef = useRef(1500); // ms
   const gameStartTimeRef = useRef(0);
   
   // Grid Config
@@ -37,7 +38,7 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     setLives(3);
     onScoreUpdate(0);
     virusesRef.current = [];
-    spawnIntervalRef.current = 1000;
+    spawnIntervalRef.current = 1500;
     gameStartTimeRef.current = performance.now();
     lastSpawnTimeRef.current = performance.now();
   };
@@ -76,6 +77,12 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
 
     // Game Loop
     const loop = (timestamp: number) => {
+      if (gameState !== 'PLAYING') {
+         draw();
+         gameLoopRef.current = requestAnimationFrame(loop);
+         return;
+      }
+
       update(timestamp);
       draw();
       
@@ -231,12 +238,30 @@ export const VirusWhackGame: React.FC<VirusWhackGameProps> = ({ onGameOver, onSc
     ctx.shadowBlur = 0;
   };
 
+  const startGame = () => {
+    setGameState('PLAYING');
+    gameStateRef.current = 'PLAYING';
+    initGame();
+  };
+
   return (
     <div className="relative">
-      <canvas 
-        ref={canvasRef} 
-        className="block bg-black border-2 border-red-500/50 rounded-lg shadow-[0_0_20px_rgba(255,0,0,0.2)] cursor-crosshair max-w-full"
-      />
+      <div className="relative">
+        <canvas 
+            ref={canvasRef} 
+            className="block bg-black border-2 border-red-500/50 rounded-lg shadow-[0_0_20px_rgba(255,0,0,0.2)] cursor-crosshair max-w-full"
+            onClick={gameState === 'START' ? startGame : undefined}
+        />
+        {gameState === 'START' && (
+            <div 
+                className="absolute inset-0 flex items-center justify-center bg-black/60 cursor-pointer rounded-lg"
+                onClick={startGame}
+                onTouchEnd={(e) => { e.preventDefault(); startGame(); }}
+            >
+                <div className="text-[#ff003c] font-mono text-2xl animate-pulse">TAP TO START</div>
+            </div>
+        )}
+      </div>
       <div className="absolute top-4 right-4 flex gap-2">
         {[...Array(3)].map((_, i) => (
             <div key={i} className={`w-4 h-4 rounded-full ${i < lives ? 'bg-green-500 shadow-[0_0_10px_#00ff00]' : 'bg-gray-800'}`} />
