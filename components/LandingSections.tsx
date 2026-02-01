@@ -451,8 +451,8 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
                </div>
                <div className="flex justify-between">
                  <span>STATUS</span>
-                 <span className={canMint ? "text-green-400" : "text-red-400"}>
-                    {canMint ? 'UNLOCKED' : 'LOCKED'}
+                 <span className="text-red-400">
+                    SYSTEM OFFLINE
                  </span>
                </div>
              </div>
@@ -479,19 +479,12 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
           </div>
 
           <div className="flex flex-col gap-4">
-            {!isWalletConnected ? (
-                <Button onClick={onConnect} className="w-full md:w-auto">
-                    <Wallet size={18} /> Connect to Mint
-                </Button>
-            ) : canMint ? (
-                <Button onClick={onMint} isLoading={isMinting} className="w-full md:w-auto">
-                    MINT FRAGMENT (0.002 ETH)
-                </Button>
-            ) : (
-                <div className="p-4 border border-red-900/50 bg-red-900/10 text-red-400 text-sm text-center animate-pulse">
-                    INSUFFICIENT DATA / ACCESS DENIED
-                </div>
-            )}
+            <Button disabled className="w-full md:w-auto opacity-50 cursor-not-allowed border-red-500/20 text-red-400">
+                <Lock size={18} /> PROTOCOL OFFLINE
+            </Button>
+            <p className="text-xs text-gray-500 text-center uppercase tracking-widest">
+                System awaiting activation
+            </p>
           </div>
         </div>
       </div>

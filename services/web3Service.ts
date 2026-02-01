@@ -154,3 +154,19 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
     return { success: false, error: errorMessage };
   }
 };
+
+export const getTotalMinted = async (): Promise<string> => {
+  const provider = getProvider();
+  // If no wallet connected, we can try to use a default RPC if available, 
+  // but for now we'll rely on the browser provider or return "0"
+  if (!provider) return "0";
+
+  try {
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+    const supply = await contract.totalSupply();
+    return supply.toString();
+  } catch (error) {
+    console.error("Error getting total supply:", error);
+    return "0";
+  }
+};

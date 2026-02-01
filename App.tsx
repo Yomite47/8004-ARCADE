@@ -23,7 +23,7 @@ export default function App() {
   const [hasMinted, setHasMinted] = useState(false);
   
   // State for total minted count
-  const [totalMinted, setTotalMinted] = useState("4050");
+  const [totalMinted, setTotalMinted] = useState("0");
   const totalCount = "5555";
 
   // Mint threshold constant
