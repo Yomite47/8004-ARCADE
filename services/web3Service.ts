@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 // Contract Configuration
 const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
 const CONTRACT_ABI = [
-  "function mint(uint256 amount, bytes calldata signature) external payable",
+  "function mint(uint256 amount, bytes signature) external payable",
   "function mintCounts(address wallet) external view returns (uint256)",
   "function mintPrice() external view returns (uint256)",
   "function FREE_MINT_LIMIT() external view returns (uint256)",
