@@ -3,14 +3,14 @@ import { ethers } from 'ethers';
 // Contract Configuration
 const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
 const CONTRACT_ABI = [
-  "function mint(uint256 amount, bytes signature) external payable",
-  "function mintCounts(address wallet) external view returns (uint256)",
-  "function mintPrice() external view returns (uint256)",
-  "function FREE_MINT_LIMIT() external view returns (uint256)",
-  "function MAX_SUPPLY() external view returns (uint256)",
-  "function MAX_PER_WALLET() external view returns (uint256)",
-  "function totalSupply() external view returns (uint256)",
-  "function gameAgent() external view returns (address)",
+  "function mint(uint256 amount, bytes signature) payable",
+  "function mintCounts(address wallet) view returns (uint256)",
+  "function mintPrice() view returns (uint256)",
+  "function FREE_MINT_LIMIT() view returns (uint256)",
+  "function MAX_SUPPLY() view returns (uint256)",
+  "function MAX_PER_WALLET() view returns (uint256)",
+  "function totalSupply() view returns (uint256)",
+  "function gameAgent() view returns (address)",
   "event NFTMinted(address indexed player, uint256 tokenId)"
 ];
 
