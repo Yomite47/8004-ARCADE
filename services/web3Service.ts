@@ -224,6 +224,48 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
   } catch (error: any) {
     console.error("Minting error:", error);
     
+    // Fallback: If the high-level contract call fails with the specific binding error,
+    // try a low-level transaction send.
+    if (error.message && (error.message.includes("bind is not a function") || error.message.includes("s[f].bind"))) {
+        console.warn("Attempting fallback low-level transaction...");
+        try {
+            const provider = getProvider();
+            if (!provider) throw new Error("No provider");
+            await switchNetwork();
+            const signer = await provider.getSigner();
+            
+            const iface = new ethers.Interface(CONTRACT_ABI);
+            const data = iface.encodeFunctionData("mint", [amount, signature]);
+            
+            // Re-calculate value (needed since we are retrying)
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+            const mintPrice = await contract.mintPrice();
+            const totalSupply = await contract.totalSupply();
+            const freeLimit = await contract.FREE_MINT_LIMIT();
+            const currentMints = await contract.mintCounts(walletAddress);
+            
+            let valueToSend = 0n;
+            for (let i = 0; i < amount; i++) {
+                 const isFree = (BigInt(totalSupply) + BigInt(i) + 1n <= BigInt(freeLimit)) && (BigInt(currentMints) + BigInt(i) === 0n);
+                 if (!isFree) valueToSend += BigInt(mintPrice);
+            }
+
+            const tx = await signer.sendTransaction({
+                to: CONTRACT_ADDRESS,
+                data: data,
+                value: valueToSend
+            });
+            
+            console.log("Fallback mint transaction sent:", tx.hash);
+            await tx.wait();
+            return { success: true };
+            
+        } catch (fallbackError: any) {
+            console.error("Fallback failed:", fallbackError);
+            // Continue to standard error handling with original error
+        }
+    }
+
     let errorMessage = "Minting failed. Please try again.";
 
     // 1. User Rejected
