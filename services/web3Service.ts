@@ -89,6 +89,13 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
   try {
     await switchNetwork();
     const signer = await provider.getSigner();
+    const signerAddress = await signer.getAddress();
+    
+    // Verify wallet address consistency
+    if (signerAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+        return { success: false, error: "Wallet mismatch. Please reconnect." };
+    }
+
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
     // 1. Request Signature from Game Agent (Backend)
@@ -194,11 +201,23 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
     }
     // 3. Insufficient Funds (Gas or Value)
     else if (error.code === 'INSUFFICIENT_FUNDS' || error.message?.includes('insufficient funds')) {
-        errorMessage = "Insufficient funds for minting (0.002 ETH + Gas).";
+        errorMessage = "Insufficient funds for minting (0.0003 ETH + Gas).";
     }
     // 4. Contract Logic Reverts
     else if (error.reason) {
-        errorMessage = `Minting failed: ${error.reason}`;
+        if (error.reason.includes("Wallet limit reached")) {
+            errorMessage = "Wallet limit reached (3 max).";
+        } else if (error.reason.includes("Max supply reached")) {
+            errorMessage = "Max supply reached.";
+        } else if (error.reason.includes("Insufficient ETH sent")) {
+            errorMessage = "Insufficient ETH sent for paid mint.";
+        } else if (error.reason.includes("Invalid signature")) {
+            errorMessage = "Invalid signature rejected by contract.";
+        } else {
+            errorMessage = `Contract Error: ${error.reason}`;
+        }
+    } else if (error.message) {
+         errorMessage = `Error: ${error.message}`;
     }
 
     return { success: false, error: errorMessage };
