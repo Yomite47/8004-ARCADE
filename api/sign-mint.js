@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 // Vercel environment variables are available as process.env in serverless functions
 // For local development, they are loaded from .env
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const CONTRACT_ADDRESS = "0xec21C17F1CD883aC5CDc449620e4399EaDee33F3";
+const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
 const MINT_THRESHOLDS = {
     'RUNNER': 20,
     'VIRUS_WHACK': 20,
