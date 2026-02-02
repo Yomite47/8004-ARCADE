@@ -379,7 +379,7 @@ export default function App() {
 
                     <div className="flex flex-col gap-4 w-full">
                         {score >= getMintThreshold(selectedGame) && (
-                            <Button onClick={handleMint} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200">
+                            <Button onClick={() => handleMint(1)} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200">
                                 MINT PROOF OF RUN
                             </Button>
                         )}
@@ -412,7 +412,7 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-full">
-                        <Button onClick={handleMint} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200 h-12 text-lg">
+                        <Button onClick={() => handleMint(1)} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200 h-12 text-lg">
                             MINT PROOF OF RUN
                         </Button>
                         
