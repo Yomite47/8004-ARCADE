@@ -122,29 +122,8 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
 
       const data = await response.json();
       signature = data.signature;
-
-      // --- DEBUG: Verify Signature Logic Locally ---
-      // This catches Private Key mismatches between Vercel and Smart Contract
-      try {
-          const messageHash = ethers.solidityPackedKeccak256(
-              ["address", "address"],
-              [walletAddress, CONTRACT_ADDRESS]
-          );
-          const recoveredAddress = ethers.verifyMessage(ethers.getBytes(messageHash), signature);
-          const onChainAgent = await contract.gameAgent();
-
-          if (recoveredAddress.toLowerCase() !== onChainAgent.toLowerCase()) {
-              console.error(`SIGNATURE MISMATCH! \nBackend Signed: ${recoveredAddress} \nContract Expects: ${onChainAgent}`);
-              throw new Error(`CONFIGURATION ERROR: Backend private key matches ${recoveredAddress}, but contract expects ${onChainAgent}. Please update Vercel env vars.`);
-          }
-      } catch (verifyErr: any) {
-          console.warn("Signature verification check failed:", verifyErr);
-          // If it's the config error, throw it to stop minting and alert user
-          if (verifyErr.message.includes("CONFIGURATION ERROR")) {
-              throw verifyErr;
-          }
-      }
-      // ---------------------------------------------
+      
+      console.log("Received signature from backend:", signature);
 
     } catch (err: any) {
       console.warn("Backend signature request failed:", err);
