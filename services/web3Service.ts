@@ -283,3 +283,17 @@ export const getTotalMinted = async (): Promise<string> => {
     return "0";
   }
 };
+
+export const getUserMintCount = async (walletAddress: string): Promise<number> => {
+  const provider = getProvider();
+  if (!provider) return 0;
+
+  try {
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+    const count = await contract.mintCounts(walletAddress);
+    return Number(count);
+  } catch (error) {
+    console.error("Error getting user mint count:", error);
+    return 0;
+  }
+};

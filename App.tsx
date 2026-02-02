@@ -9,7 +9,7 @@ import { Button } from './components/Button';
 import { HeroSection, StorySection, GameplaySection, MintingSection, Footer } from './components/LandingSections';
 import { AppStage } from './types';
 import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight } from 'lucide-react';
-import { connectWallet, mintNFT, checkCanMint, getTotalMinted } from './services/web3Service';
+import { connectWallet, mintNFT, checkCanMint, getTotalMinted, getUserMintCount } from './services/web3Service';
 
 export default function App() {
   const [stage, setStage] = useState<AppStage>(AppStage.LANDING);
@@ -21,11 +21,13 @@ export default function App() {
   const [address, setAddress] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
+  const [userMintCount, setUserMintCount] = useState(0);
   const [mintTxHash, setMintTxHash] = useState<string>("");
   
   // State for total minted count
   const [totalMinted, setTotalMinted] = useState("0");
   const totalCount = "5555";
+
 
   // Mint threshold constant
   const getMintThreshold = (game: 'RUNNER' | 'SNAKE' | 'BLOCK_BREAKER' | 'SPACE_INVADERS' | 'VIRUS_WHACK' | 'CYBER_FLAP') => {
@@ -72,6 +74,8 @@ export default function App() {
       setAddress(addr);
       if (addr) {
           const canMint = await checkCanMint(addr);
+          const count = await getUserMintCount(addr);
+          setUserMintCount(count);
           // If they CAN mint, it means they haven't minted yet.
           // If they CANNOT mint (checkCanMint returns false), it implies they HAVE minted (or other error).
           // checkCanMint returns !hasMinted.
@@ -290,6 +294,7 @@ export default function App() {
             isMinting={isMinting}
             canMint={score >= getMintThreshold(selectedGame) || (stage === AppStage.GAME_OVER && score >= getMintThreshold(selectedGame))}
             hasMinted={hasMinted}
+            userMintCount={userMintCount}
             totalMinted={totalMinted}
             maxSupply={totalCount}
             isWalletConnected={!!address}

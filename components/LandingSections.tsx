@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from './Button';
 import { 
   Cpu, Play, Skull, Trophy, Wallet, ArrowRight, Github, Twitter, Disc, Loader2,
@@ -411,6 +411,7 @@ interface MintingSectionProps {
     isMinting: boolean;
   canMint: boolean;
   hasMinted: boolean;
+  userMintCount: number;
   totalMinted: string;
   maxSupply: string;
   isWalletConnected: boolean;
@@ -422,6 +423,7 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
   isMinting, 
   canMint, 
   hasMinted,
+  userMintCount,
   totalMinted, 
   maxSupply, 
   isWalletConnected, 
