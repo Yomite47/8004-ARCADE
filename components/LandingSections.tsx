@@ -409,17 +409,25 @@ export const GameplaySection: React.FC = () => {
 interface MintingSectionProps {
     onMint: (amount: number) => void;
     isMinting: boolean;
-    canMint: boolean;
-    totalMinted?: string;
-    maxSupply?: string;
-    isWalletConnected: boolean;
-    onConnect: () => void;
+  canMint: boolean;
+  hasMinted: boolean;
+  totalMinted: string;
+  maxSupply: string;
+  isWalletConnected: boolean;
+  onConnect: () => void;
 }
 
 export const MintingSection: React.FC<MintingSectionProps> = ({ 
-    onMint, isMinting, canMint, totalMinted, maxSupply, isWalletConnected, onConnect 
+  onMint, 
+  isMinting, 
+  canMint, 
+  hasMinted,
+  totalMinted, 
+  maxSupply, 
+  isWalletConnected, 
+  onConnect 
 }) => {
-  const [mintAmount, setMintAmount] = React.useState(1);
+  const [mintAmount, setMintAmount] = useState(1);
 
   return (
     <section className="py-24 px-6 bg-gradient-to-b from-[#0a0a0a] to-black border-t border-white/5">
@@ -503,6 +511,13 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
               >
                 <Wallet size={18} /> CONNECT WALLET TO MINT
               </Button>
+            ) : hasMinted ? (
+              <Button 
+                disabled
+                className="w-full md:w-auto opacity-50 cursor-not-allowed border-white/20 bg-green-900/20 text-green-500"
+              >
+                <CheckCircle size={18} /> ALREADY MINTED
+              </Button>
             ) : canMint ? (
               <Button 
                 onClick={() => onMint(mintAmount)}
@@ -516,11 +531,11 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
                 disabled
                 className="w-full md:w-auto opacity-50 cursor-not-allowed border-white/20"
               >
-                <Lock size={18} /> ALREADY MINTED / NOT QUALIFIED
+                <Lock size={18} /> COMPLETE RUN TO UNLOCK
               </Button>
             )}
             <p className="text-xs text-gray-500 text-center uppercase tracking-widest">
-              {canMint ? 'Protocol ready for synchronization' : 'Complete a run to unlock access'}
+              {hasMinted ? 'Artifact acquired' : canMint ? 'Protocol ready for synchronization' : 'Complete a run to unlock access'}
             </p>
           </div>
         </div>

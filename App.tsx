@@ -21,6 +21,7 @@ export default function App() {
   const [address, setAddress] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
+  const [mintTxHash, setMintTxHash] = useState<string>("");
   
   // State for total minted count
   const [totalMinted, setTotalMinted] = useState("0");
@@ -187,6 +188,7 @@ export default function App() {
       const result = await mintNFT(score, address, selectedGame, amount);
       if (result.success) {
         setHasMinted(true);
+        if (result.txHash) setMintTxHash(result.txHash);
         setStage(AppStage.MINT_SUCCESS);
       } else {
         alert(result.error || "Minting failed.");
@@ -287,6 +289,7 @@ export default function App() {
             onMint={handleMint}
             isMinting={isMinting}
             canMint={score >= getMintThreshold(selectedGame) || (stage === AppStage.GAME_OVER && score >= getMintThreshold(selectedGame))}
+            hasMinted={hasMinted}
             totalMinted={totalMinted}
             maxSupply={totalCount}
             isWalletConnected={!!address}
@@ -442,7 +445,9 @@ export default function App() {
                          <div className="absolute top-0 right-0 w-2 h-2 bg-green-500"></div>
                         <div className="flex justify-between mb-2">
                             <span className="text-gray-500">TX HASH</span>
-                            <span className="text-green-400">0x8a...4b21</span>
+                            <a href={`https://etherscan.io/tx/${mintTxHash}`} target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 hover:underline">
+                                {mintTxHash ? `${mintTxHash.substring(0, 10)}...${mintTxHash.substring(mintTxHash.length - 8)}` : 'PROCESSING...'}
+                            </a>
                         </div>
                         <div className="flex justify-between mb-2">
                             <span className="text-gray-500">BLOCK</span>

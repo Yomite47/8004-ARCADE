@@ -142,7 +142,7 @@ export const checkCanMint = async (walletAddress: string): Promise<boolean> => {
   }
 };
 
-export const mintNFT = async (score: number, walletAddress: string, game: string, amount: number = 1): Promise<{ success: boolean; error?: string }> => {
+export const mintNFT = async (score: number, walletAddress: string, game: string, amount: number = 1): Promise<{ success: boolean; error?: string; txHash?: string }> => {
   const provider = getProvider();
   if (!provider) return { success: false, error: "No wallet provider found" };
 
@@ -224,7 +224,7 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
     console.log("Mint transaction sent:", tx.hash);
     await tx.wait();
     
-    return { success: true };
+    return { success: true, txHash: tx.hash };
 
   } catch (error: any) {
     console.error("Minting error:", error);
