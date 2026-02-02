@@ -156,11 +156,7 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
         return { success: false, error: "Wallet mismatch. Please reconnect." };
     }
 
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-    // 1. Request Signature from Game Agent (Backend)
-    // In production (Vercel), this hits /api/sign-mint (Serverless Function)
-    // Locally, Vite proxies /api to the backend or we can run the backend separately
+    // 1. Get Signature from Backend
     let signature;
     try {
       // Use relative path so it works both on localhost (via proxy) and production (same domain)
@@ -190,29 +186,38 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
       return { success: false, error: `Signature failed: ${err.message}` };
     }
 
-    // 2. Mint with Signature
+    // 2. Mint with Signature using Low-Level Transaction (Safer than Contract Object)
     
+    // Create READ-ONLY contract instance for calculating price
+    // We use 'provider' here, not 'signer', which avoids the binding issues
+    const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
     // Fetch current state to determine price
-    const mintPrice = await contract.mintPrice();
-    const totalSupply = await contract.totalSupply();
-    const freeLimit = await contract.FREE_MINT_LIMIT();
-    const currentMints = await contract.mintCounts(walletAddress);
+    const mintPrice = await readContract.mintPrice();
+    const totalSupply = await readContract.totalSupply();
+    const freeLimit = await readContract.FREE_MINT_LIMIT();
+    const currentMints = await readContract.mintCounts(walletAddress);
     
     let valueToSend = 0n;
     
     // Calculate total cost loop matching contract logic
     for (let i = 0; i < amount; i++) {
-         // Contract logic: bool isFree = (_tokenIds + i + 1 <= FREE_MINT_LIMIT) && (mintCounts[msg.sender] + i == 0);
-         // We approximate _tokenIds with totalSupply (might be slightly off if concurrent mints, but safe for estimation)
-         // Note: BigInt arithmetic
          const isFree = (BigInt(totalSupply) + BigInt(i) + 1n <= BigInt(freeLimit)) && (BigInt(currentMints) + BigInt(i) === 0n);
-         
          if (!isFree) {
              valueToSend += BigInt(mintPrice);
          }
     }
 
-    const tx = await contract.mint(amount, signature, {
+    console.log(`Minting ${amount} items. Value required: ${valueToSend.toString()}`);
+
+    // Encode function data manually
+    const iface = new ethers.Interface(CONTRACT_ABI);
+    const data = iface.encodeFunctionData("mint", [amount, signature]);
+
+    // Send raw transaction
+    const tx = await signer.sendTransaction({
+      to: CONTRACT_ADDRESS,
+      data: data,
       value: valueToSend
     });
 
@@ -224,48 +229,6 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
   } catch (error: any) {
     console.error("Minting error:", error);
     
-    // Fallback: If the high-level contract call fails with the specific binding error,
-    // try a low-level transaction send.
-    if (error.message && (error.message.includes("bind is not a function") || error.message.includes("s[f].bind"))) {
-        console.warn("Attempting fallback low-level transaction...");
-        try {
-            const provider = getProvider();
-            if (!provider) throw new Error("No provider");
-            await switchNetwork();
-            const signer = await provider.getSigner();
-            
-            const iface = new ethers.Interface(CONTRACT_ABI);
-            const data = iface.encodeFunctionData("mint", [amount, signature]);
-            
-            // Re-calculate value (needed since we are retrying)
-            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-            const mintPrice = await contract.mintPrice();
-            const totalSupply = await contract.totalSupply();
-            const freeLimit = await contract.FREE_MINT_LIMIT();
-            const currentMints = await contract.mintCounts(walletAddress);
-            
-            let valueToSend = 0n;
-            for (let i = 0; i < amount; i++) {
-                 const isFree = (BigInt(totalSupply) + BigInt(i) + 1n <= BigInt(freeLimit)) && (BigInt(currentMints) + BigInt(i) === 0n);
-                 if (!isFree) valueToSend += BigInt(mintPrice);
-            }
-
-            const tx = await signer.sendTransaction({
-                to: CONTRACT_ADDRESS,
-                data: data,
-                value: valueToSend
-            });
-            
-            console.log("Fallback mint transaction sent:", tx.hash);
-            await tx.wait();
-            return { success: true };
-            
-        } catch (fallbackError: any) {
-            console.error("Fallback failed:", fallbackError);
-            // Continue to standard error handling with original error
-        }
-    }
-
     let errorMessage = "Minting failed. Please try again.";
 
     // 1. User Rejected
