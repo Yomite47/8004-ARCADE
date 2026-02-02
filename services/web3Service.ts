@@ -2,16 +2,76 @@ import { ethers } from 'ethers';
 
 // Contract Configuration
 const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
+// Full JSON ABI to prevent parsing errors in production
 const CONTRACT_ABI = [
-  "function mint(uint256 amount, bytes signature) payable",
-  "function mintCounts(address wallet) view returns (uint256)",
-  "function mintPrice() view returns (uint256)",
-  "function FREE_MINT_LIMIT() view returns (uint256)",
-  "function MAX_SUPPLY() view returns (uint256)",
-  "function MAX_PER_WALLET() view returns (uint256)",
-  "function totalSupply() view returns (uint256)",
-  "function gameAgent() view returns (address)",
-  "event NFTMinted(address indexed player, uint256 tokenId)"
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "bytes", "name": "signature", "type": "bytes" }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "wallet", "type": "address" }],
+    "name": "mintCounts",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mintPrice",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "FREE_MINT_LIMIT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_SUPPLY",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_PER_WALLET",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "gameAgent",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "player", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "name": "NFTMinted",
+    "type": "event"
+  }
 ];
 
 const CHAIN_ID = '0x1'; // Ethereum Mainnet
