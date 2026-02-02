@@ -266,11 +266,11 @@ export const CyberFlapGame: React.FC<CyberFlapGameProps> = ({ onGameOver, onScor
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full flex justify-center items-center overflow-hidden">
       <canvas 
         ref={canvasRef} 
-        className="block w-full bg-black border-2 border-cyan-500/50 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.2)] touch-none"
-        style={{ touchAction: 'none' }}
+        className="block w-full max-w-[600px] h-auto bg-black border-2 border-cyan-500/50 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.2)] touch-none"
+        style={{ touchAction: 'none', aspectRatio: '600/500' }}
       />
     </div>
   );
