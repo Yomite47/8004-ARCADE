@@ -184,7 +184,7 @@ export const HeroSection: React.FC<SectionProps> = ({
               borderColor="border-yellow-500/30"
               onClick={onPlayRunner}
               isWalletConnected={isWalletConnected}
-              status="COMING SOON"
+              status="LIVE"
             />
             
             <GameCard 
@@ -195,7 +195,7 @@ export const HeroSection: React.FC<SectionProps> = ({
               borderColor="border-blue-500/30"
               onClick={onPlayBlockBreaker}
               isWalletConnected={isWalletConnected}
-              status="COMING SOON"
+              status="LIVE"
             />
 
             <GameCard 
@@ -206,7 +206,7 @@ export const HeroSection: React.FC<SectionProps> = ({
               borderColor="border-cyan-500/30"
               onClick={onPlayCyberFlap}
               isWalletConnected={isWalletConnected}
-              status="COMING SOON"
+              status="LIVE"
             />
 
             <GameCard 
@@ -496,15 +496,31 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
           </div>
 
           <div className="flex flex-col gap-4">
-            <Button 
+            {!isWalletConnected ? (
+              <Button 
+                onClick={onConnect}
+                className="w-full md:w-auto bg-white text-black hover:bg-gray-200"
+              >
+                <Wallet size={18} /> CONNECT WALLET TO MINT
+              </Button>
+            ) : canMint ? (
+              <Button 
                 onClick={() => onMint(mintAmount)}
-                disabled={true} // Hardcoded disabled as per instruction
-                className="w-full md:w-auto opacity-50 cursor-not-allowed border-red-500/20 text-red-400"
-            >
-                <Lock size={18} /> PROTOCOL OFFLINE
-            </Button>
+                isLoading={isMinting}
+                className="w-full md:w-auto bg-green-500 hover:bg-green-600 text-black border-none"
+              >
+                <CheckCircle size={18} /> MINT FRAGMENT ({mintAmount})
+              </Button>
+            ) : (
+              <Button 
+                disabled
+                className="w-full md:w-auto opacity-50 cursor-not-allowed border-white/20"
+              >
+                <Lock size={18} /> ALREADY MINTED / NOT QUALIFIED
+              </Button>
+            )}
             <p className="text-xs text-gray-500 text-center uppercase tracking-widest">
-                System awaiting activation
+              {canMint ? 'Protocol ready for synchronization' : 'Complete a run to unlock access'}
             </p>
           </div>
         </div>
@@ -529,7 +545,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="flex gap-4">
-          <a href="https://x.com/8004Arcade" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
+          <a href="https://x.com/8004Arcade_" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
             <Twitter size={18} />
           </a>
           <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
