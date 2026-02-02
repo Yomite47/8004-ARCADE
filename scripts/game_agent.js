@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 require('dotenv').config();
 
 const PORT = 3000;
-const CONTRACT_ADDRESS = "0xec21C17F1CD883aC5CDc449620e4399EaDee33F3"; // Deployed address
+const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0"; // Deployed address
 
 const MINT_THRESHOLDS = {
     'RUNNER': 20,

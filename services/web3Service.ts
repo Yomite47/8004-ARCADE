@@ -1,18 +1,19 @@
 import { ethers } from 'ethers';
 
 // Contract Configuration
-const CONTRACT_ADDRESS = "0xec21C17F1CD883aC5CDc449620e4399EaDee33F3";
+const CONTRACT_ADDRESS = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
 const CONTRACT_ABI = [
-  "function mint(bytes calldata signature) external payable",
-  "function canMint(address wallet) external view returns (bool)",
-  "function hasMinted(address wallet) external view returns (bool)",
-  "function MINT_PRICE() external view returns (uint256)",
+  "function mint(uint256 amount, bytes calldata signature) external payable",
+  "function mintCounts(address wallet) external view returns (uint256)",
+  "function mintPrice() external view returns (uint256)",
+  "function FREE_MINT_LIMIT() external view returns (uint256)",
   "function MAX_SUPPLY() external view returns (uint256)",
+  "function MAX_PER_WALLET() external view returns (uint256)",
   "function totalSupply() external view returns (uint256)",
   "event NFTMinted(address indexed player, uint256 tokenId)"
 ];
 
-const SEPOLIA_CHAIN_ID = '0xaa36a7';
+const CHAIN_ID = '0x1'; // Ethereum Mainnet
 
 // Helper to get the browser provider
 const getProvider = () => {
@@ -26,20 +27,20 @@ const switchNetwork = async () => {
   const provider = getProvider();
   if (!provider) return;
   try {
-    await provider.send("wallet_switchEthereumChain", [{ chainId: SEPOLIA_CHAIN_ID }]);
+    await provider.send("wallet_switchEthereumChain", [{ chainId: CHAIN_ID }]);
   } catch (error: any) {
     // This error code indicates that the chain has not been added to MetaMask.
     if (error.code === 4902) {
       await provider.send("wallet_addEthereumChain", [{
-        chainId: SEPOLIA_CHAIN_ID,
-        chainName: 'Sepolia',
-        rpcUrls: ['https://rpc.sepolia.org'],
+        chainId: CHAIN_ID,
+        chainName: 'Ethereum Mainnet',
+        rpcUrls: ['https://eth.llamarpc.com'], // Public RPC
         nativeCurrency: {
-            name: 'Sepolia Ether',
+            name: 'Ether',
             symbol: 'ETH',
             decimals: 18
         },
-        blockExplorerUrls: ['https://sepolia.etherscan.io']
+        blockExplorerUrls: ['https://etherscan.io']
       }]);
     } else {
       console.error("Failed to switch network:", error);
@@ -71,16 +72,16 @@ export const checkCanMint = async (walletAddress: string): Promise<boolean> => {
 
   try {
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-    // The contract has a 'canMint' helper, or we can check '!hasMinted'
-    const alreadyMinted = await contract.hasMinted(walletAddress);
-    return !alreadyMinted;
+    const mintCount = await contract.mintCounts(walletAddress);
+    const maxPerWallet = await contract.MAX_PER_WALLET();
+    return mintCount < maxPerWallet;
   } catch (error) {
     console.error("Error checking mint status:", error);
     return false;
   }
 };
 
-export const mintNFT = async (score: number, walletAddress: string, game: string): Promise<{ success: boolean; error?: string }> => {
+export const mintNFT = async (score: number, walletAddress: string, game: string, amount: number = 1): Promise<{ success: boolean; error?: string }> => {
   const provider = getProvider();
   if (!provider) return { success: false, error: "No wallet provider found" };
 
@@ -98,7 +99,7 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
       const response = await fetch('/api/sign-mint', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress, score, game }) 
+        body: JSON.stringify({ wallet: walletAddress, score, game, amount }) 
       });
 
       if (!response.ok) {
@@ -114,10 +115,29 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
     }
 
     // 2. Mint with Signature
-    const mintPrice = await contract.MINT_PRICE();
     
-    const tx = await contract.mint(signature, {
-      value: mintPrice
+    // Fetch current state to determine price
+    const mintPrice = await contract.mintPrice();
+    const totalSupply = await contract.totalSupply();
+    const freeLimit = await contract.FREE_MINT_LIMIT();
+    const currentMints = await contract.mintCounts(walletAddress);
+    
+    let valueToSend = 0n;
+    
+    // Calculate total cost loop matching contract logic
+    for (let i = 0; i < amount; i++) {
+         // Contract logic: bool isFree = (_tokenIds + i + 1 <= FREE_MINT_LIMIT) && (mintCounts[msg.sender] + i == 0);
+         // We approximate _tokenIds with totalSupply (might be slightly off if concurrent mints, but safe for estimation)
+         // Note: BigInt arithmetic
+         const isFree = (BigInt(totalSupply) + BigInt(i) + 1n <= BigInt(freeLimit)) && (BigInt(currentMints) + BigInt(i) === 0n);
+         
+         if (!isFree) {
+             valueToSend += BigInt(mintPrice);
+         }
+    }
+
+    const tx = await contract.mint(amount, signature, {
+      value: valueToSend
     });
 
     console.log("Mint transaction sent:", tx.hash);

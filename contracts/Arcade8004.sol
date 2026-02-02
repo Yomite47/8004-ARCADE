@@ -20,16 +20,21 @@ contract Arcade8004 is ERC721, Ownable {
     // Base URI for metadata
     string public baseURI;
     
-    // Track if a wallet has already minted (global restriction across all games)
-    mapping(address => bool) public hasMinted;
+    // Track number of mints per wallet
+    mapping(address => uint256) public mintCounts;
 
-    // Mint price (~$5 equivalent)
-    uint256 public constant MINT_PRICE = 0.002 ether;
+    // Mint price (~$1 equivalent)
+    uint256 public mintPrice = 0.0003 ether;
     // Max supply cap
     uint256 public constant MAX_SUPPLY = 5555;
+    // Free mint global limit
+    uint256 public constant FREE_MINT_LIMIT = 500;
+    // Max per wallet
+    uint256 public constant MAX_PER_WALLET = 3;
 
     event NFTMinted(address indexed player, uint256 tokenId);
     event GameAgentUpdated(address indexed newAgent);
+    event MintPriceUpdated(uint256 newPrice);
 
     constructor(address _gameAgent) ERC721("8004 Arcade", "A8004") Ownable(msg.sender) {
         require(_gameAgent != address(0), "Invalid agent address");
@@ -37,16 +42,29 @@ contract Arcade8004 is ERC721, Ownable {
     }
 
     /**
-     * @dev Mints a new NFT if the user has a valid signature from the game agent.
-     * The signature proves they reached the required score.
-     * Users can only mint ONE NFT per wallet, regardless of which game they played.
-     * 
-     * @param signature The cryptographic signature from the game agent
+     * @dev Mints new NFTs if the user has a valid signature.
+     * First 500 global mints allow 1 free mint per wallet.
+     * Subsequent mints or late mints cost $1.
+     * Max 3 per wallet.
      */
-    function mint(bytes calldata signature) external payable {
-        require(_tokenIds < MAX_SUPPLY, "Max supply reached");
-        require(!hasMinted[msg.sender], "Wallet has already minted an NFT");
-        require(msg.value >= MINT_PRICE, "Insufficient ETH sent (0.002 ETH required)");
+    function mint(uint256 amount, bytes calldata signature) external payable {
+        require(amount > 0, "Amount must be > 0");
+        require(_tokenIds + amount <= MAX_SUPPLY, "Max supply reached");
+        require(mintCounts[msg.sender] + amount <= MAX_PER_WALLET, "Wallet limit reached (3 max)");
+        
+        // Calculate Cost
+        uint256 cost = 0;
+        for (uint256 i = 0; i < amount; i++) {
+            // Check if this specific mint is eligible for free tier
+            // Rule: Global Supply must be within limit AND it must be user's first mint
+            bool isFree = (_tokenIds + i + 1 <= FREE_MINT_LIMIT) && (mintCounts[msg.sender] + i == 0);
+            
+            if (!isFree) {
+                cost += mintPrice;
+            }
+        }
+        
+        require(msg.value >= cost, "Insufficient ETH sent");
         
         // Verify the signature
         // The message includes the contract address to prevent cross-contract replay attacks
@@ -57,15 +75,23 @@ contract Arcade8004 is ERC721, Ownable {
         
         require(signer == gameAgent, "Invalid signature from game agent");
         
-        // Mark as minted BEFORE interaction to prevent re-entrancy (though _mint is safe)
-        hasMinted[msg.sender] = true;
+        // Update counts
+        mintCounts[msg.sender] += amount;
         
-        _tokenIds++;
-        uint256 newItemId = _tokenIds;
-        
-        _safeMint(msg.sender, newItemId);
-        
-        emit NFTMinted(msg.sender, newItemId);
+        // Mint loop
+        for (uint256 i = 0; i < amount; i++) {
+            _tokenIds++;
+            _safeMint(msg.sender, _tokenIds);
+            emit NFTMinted(msg.sender, _tokenIds);
+        }
+    }
+
+    /**
+     * @dev Updates the mint price
+     */
+    function setMintPrice(uint256 _newPrice) external onlyOwner {
+        mintPrice = _newPrice;
+        emit MintPriceUpdated(_newPrice);
     }
 
     /**
@@ -115,7 +141,7 @@ contract Arcade8004 is ERC721, Ownable {
      * @dev View function to check if a wallet is eligible to mint
      */
     function canMint(address wallet) external view returns (bool) {
-        return !hasMinted[wallet];
+        return mintCounts[wallet] < MAX_PER_WALLET;
     }
 
     /**

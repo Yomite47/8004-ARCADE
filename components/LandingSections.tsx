@@ -407,7 +407,7 @@ export const GameplaySection: React.FC = () => {
 };
 
 interface MintingSectionProps {
-    onMint: () => void;
+    onMint: (amount: number) => void;
     isMinting: boolean;
     canMint: boolean;
     totalMinted?: string;
@@ -419,6 +419,8 @@ interface MintingSectionProps {
 export const MintingSection: React.FC<MintingSectionProps> = ({ 
     onMint, isMinting, canMint, totalMinted, maxSupply, isWalletConnected, onConnect 
 }) => {
+  const [mintAmount, setMintAmount] = React.useState(1);
+
   return (
     <section className="py-24 px-6 bg-gradient-to-b from-[#0a0a0a] to-black border-t border-white/5">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
@@ -478,8 +480,27 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
             </p>
           </div>
 
+          <div className="flex items-center gap-4 mb-6 p-4 bg-white/5 border border-white/10 rounded-lg">
+             <span className="text-gray-400 text-sm">MINT AMOUNT (MAX 3)</span>
+             <div className="flex items-center gap-3 ml-auto">
+                <button 
+                  onClick={() => setMintAmount(Math.max(1, mintAmount - 1))}
+                  className="w-8 h-8 flex items-center justify-center border border-white/20 hover:bg-white/10 text-white transition-colors"
+                >-</button>
+                <span className="text-white font-mono text-xl w-8 text-center">{mintAmount}</span>
+                <button 
+                  onClick={() => setMintAmount(Math.min(3, mintAmount + 1))}
+                  className="w-8 h-8 flex items-center justify-center border border-white/20 hover:bg-white/10 text-white transition-colors"
+                >+</button>
+             </div>
+          </div>
+
           <div className="flex flex-col gap-4">
-            <Button disabled className="w-full md:w-auto opacity-50 cursor-not-allowed border-red-500/20 text-red-400">
+            <Button 
+                onClick={() => onMint(mintAmount)}
+                disabled={true} // Hardcoded disabled as per instruction
+                className="w-full md:w-auto opacity-50 cursor-not-allowed border-red-500/20 text-red-400"
+            >
                 <Lock size={18} /> PROTOCOL OFFLINE
             </Button>
             <p className="text-xs text-gray-500 text-center uppercase tracking-widest">

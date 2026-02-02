@@ -11,7 +11,20 @@ async function main() {
 
   // Deploy the contract
   const Arcade8004 = await hre.ethers.getContractFactory("Arcade8004");
-  const arcade = await Arcade8004.deploy(gameAgent);
+  
+  // Manual gas settings for Mainnet reliability
+  const feeData = await hre.ethers.provider.getFeeData();
+  const gasOptions = {};
+  
+  if (feeData.maxFeePerGas) {
+     // Add 20% buffer to maxFeePerGas
+     gasOptions.maxFeePerGas = feeData.maxFeePerGas * 120n / 100n;
+     gasOptions.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ? (feeData.maxPriorityFeePerGas * 120n / 100n) : hre.ethers.parseUnits("1.5", "gwei");
+  }
+
+  console.log("Deploying with gas options:", gasOptions);
+
+  const arcade = await Arcade8004.deploy(gameAgent, gasOptions);
 
   await arcade.waitForDeployment();
   const contractAddress = await arcade.getAddress();

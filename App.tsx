@@ -179,12 +179,12 @@ export default function App() {
     setStage(AppStage.GAME_OVER);
   };
 
-  const handleMint = async () => {
+  const handleMint = async (amount: number = 1) => {
     if(!address) return;
     
     setIsMinting(true);
     try {
-      const result = await mintNFT(score, address, selectedGame);
+      const result = await mintNFT(score, address, selectedGame, amount);
       if (result.success) {
         setHasMinted(true);
         setStage(AppStage.MINT_SUCCESS);
