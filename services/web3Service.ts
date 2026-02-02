@@ -99,7 +99,12 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
       const response = await fetch('/api/sign-mint', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress, score, game, amount }) 
+        body: JSON.stringify({ 
+          wallet: walletAddress, 
+          score: Number(score), // Ensure primitive number
+          game: String(game),   // Ensure primitive string
+          amount: Number(amount) // Ensure primitive number
+        }) 
       });
 
       if (!response.ok) {
