@@ -109,9 +109,9 @@ export const mintNFT = async (score: number, walletAddress: string, game: string
 
       const data = await response.json();
       signature = data.signature;
-    } catch (err) {
+    } catch (err: any) {
       console.warn("Backend signature request failed:", err);
-      return { success: false, error: "Signature failed. Ensure backend is running." };
+      return { success: false, error: `Signature failed: ${err.message}` };
     }
 
     // 2. Mint with Signature
