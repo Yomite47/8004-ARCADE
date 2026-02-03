@@ -8,7 +8,7 @@ import { CyberFlapGame } from './components/CyberFlapGame';
 import { Button } from './components/Button';
 import { HeroSection, StorySection, GameplaySection, MintingSection, Footer } from './components/LandingSections';
 import { AppStage } from './types';
-import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, RefreshCw, Trophy, ArrowLeft, Loader2, Wallet, ArrowRight, Share2 } from 'lucide-react';
 import { connectWallet, mintNFT, checkCanMint, getTotalMinted, getUserMintCount } from './services/web3Service';
 
 export default function App() {
