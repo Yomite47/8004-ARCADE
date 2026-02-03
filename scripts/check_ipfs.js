@@ -1,6 +1,6 @@
 const https = require('https');
 
-const cid = "bafybeiedmhpgjvcvgplv4wbanhajpzrk4532n7rnvc6vtgijwfdmtw3h3a";
+const cid = "bafybeifyvxovvrv7nf5mglmrm7emkgashjjahtxlure44b5fwcmzpdwjcu";
 const tokenId = "1";
 // Try nested folder
 const url = `https://gateway.pinata.cloud/ipfs/${cid}/metadata/${tokenId}.json`;

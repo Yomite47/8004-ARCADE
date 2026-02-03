@@ -2,8 +2,8 @@
 
 ## 1. Asset Storage (Pinata) - COMPLETED
 - **Images CID**: `bafybeie7gculxwgutnszmz7emdbauhiwug7a3xgd6h47bhomncqv5677my`
-- **Metadata CID**: `bafybeiedmhpgjvcvgplv4wbanhajpzrk4532n7rnvc6vtgijwfdmtw3h3a`
-- The Base URI is configured in `scripts/deploy.js` as: `ipfs://bafybeiedmhpgjvcvgplv4wbanhajpzrk4532n7rnvc6vtgijwfdmtw3h3a/`
+- **Metadata CID**: `bafybeifyvxovvrv7nf5mglmrm7emkgashjjahtxlure44b5fwcmzpdwjcu`
+- The Base URI is configured in `scripts/deploy.js` as: `ipfs://bafybeifyvxovvrv7nf5mglmrm7emkgashjjahtxlure44b5fwcmzpdwjcu/`
 
 ## 2. Smart Contract Deployment (Hardhat)
 We are using Hardhat to deploy the contract, which gives you full control without relying on third-party deployment platforms.

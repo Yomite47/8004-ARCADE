@@ -3,14 +3,8 @@ const hre = require("hardhat");
 async function main() {
   const contractAddress = "0x2AE8969DDDAf15e268792B4c361c45E20993ceC0";
   
-  // Get CID from command line arguments
-  const args = process.argv.slice(2);
-  if (args.length === 0) {
-    console.error("Please provide the new CID as an argument.");
-    console.error("Usage: npx hardhat run scripts/update_base_uri.js --network mainnet -- <NEW_CID>");
-    process.exit(1);
-  }
-  const newCID = args[0]; 
+  // Hardcoded CID
+  const newCID = "bafybeifyvxovvrv7nf5mglmrm7emkgashjjahtxlure44b5fwcmzpdwjcu";
   
   const newBaseURI = `ipfs://${newCID}/`;
 

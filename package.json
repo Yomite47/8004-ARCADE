@@ -12,6 +12,7 @@
     "axios": "^1.13.4",
     "ethers": "^6.16.0",
     "form-data": "^4.0.5",
+    "ipfs-car": "^3.1.0",
     "lucide-react": "^0.263.1",
     "pinata": "^2.5.3",
     "pinata-web3": "^0.5.4",

@@ -1,34 +1,47 @@
 const fs = require('fs');
 const path = require('path');
 
-const metadataPath = path.join(__dirname, '../public/ready_for_upload/metadata');
-const imageCid = process.argv[2];
+const metadataDir = path.join(__dirname, '../dist/ready_for_upload/metadata');
+const newCid = 'bafybeie7gculxwgutnszmz7emdbauhiwug7a3xgd6h47bhomncqv5677my';
 
-if (!imageCid) {
-    console.error("Please provide the Image CID as an argument.");
-    console.error("Usage: node scripts/update_metadata_cid.js <IMAGE_CID>");
+if (!fs.existsSync(metadataDir)) {
+    console.error(`❌ Metadata directory not found: ${metadataDir}`);
     process.exit(1);
 }
 
-console.log(`Updating metadata files in ${metadataPath} with Image CID: ${imageCid}`);
+console.log(`🚀 Updating metadata in ${metadataDir} with new CID: ${newCid}...`);
 
-const files = fs.readdirSync(metadataPath);
+const files = fs.readdirSync(metadataDir);
 let count = 0;
 
-for (const file of files) {
+files.forEach(file => {
     if (file.endsWith('.json')) {
-        const filePath = path.join(metadataPath, file);
-        const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        
-        // Update image URL
-        // Assumes file name matches image name (e.g. 1.json -> 1.png)
-        const id = file.replace('.json', '');
-        content.image = `ipfs://${imageCid}/${id}.png`;
-        
-        fs.writeFileSync(filePath, JSON.stringify(content, null, 2));
-        count++;
+        const filePath = path.join(metadataDir, file);
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const json = JSON.parse(content);
+            
+            // Check if update is needed
+            if (json.image && !json.image.includes(newCid)) {
+                // Replace the old CID part or construct new URL
+                // Assuming format ipfs://CID/filename.png
+                const fileName = path.basename(json.image); // e.g., 1.png
+                
+                // If the old format was different, we might need more robust parsing
+                // But based on previous read: "ipfs://bafy.../1.png"
+                
+                // Let's just extract the filename and rebuild
+                const imageFilename = json.image.split('/').pop();
+                
+                json.image = `ipfs://${newCid}/${imageFilename}`;
+                
+                fs.writeFileSync(filePath, JSON.stringify(json, null, 2));
+                count++;
+            }
+        } catch (e) {
+            console.error(`❌ Error processing ${file}:`, e.message);
+        }
     }
-}
+});
 
-console.log(`✅ Updated ${count} metadata files!`);
-console.log("Now upload the 'public/ready_for_upload/metadata' folder to Pinata.");
+console.log(`✅ Updated ${count} metadata files.`);

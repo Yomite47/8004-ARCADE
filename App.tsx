@@ -231,6 +231,12 @@ export default function App() {
       </div>
       
       <div className="flex items-center gap-4 pointer-events-auto">
+          {/* Total Minted Display */}
+          <div className="hidden md:flex flex-col items-end mr-4 border-r border-white/10 pr-4">
+              <span className="text-[10px] text-gray-500 tracking-widest">MINTED</span>
+              <span className="font-mono font-bold text-white text-xs">{totalMinted} / {totalCount}</span>
+          </div>
+
           {/* Score Display (In Game) - HIDDEN for surprise */}
           {stage !== AppStage.LANDING && (
              <div className="text-xl font-mono font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] mr-4 flex items-center gap-2">
@@ -420,8 +426,23 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-full">
-                        <Button onClick={() => handleMint(1)} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200 h-12 text-lg">
-                            MINT PROOF OF RUN
+                        <div className="flex items-center gap-4 mb-2 p-3 bg-white/5 border border-white/10 rounded-lg w-full">
+                            <span className="text-gray-400 text-xs">QUANTITY (MAX 3)</span>
+                            <div className="flex items-center gap-3 ml-auto">
+                                <button 
+                                    onClick={() => setMintAmount(Math.max(1, mintAmount - 1))}
+                                    className="w-8 h-8 flex items-center justify-center border border-white/20 hover:bg-white/10 text-white transition-colors"
+                                >-</button>
+                                <span className="text-white font-mono text-xl w-8 text-center">{mintAmount}</span>
+                                <button 
+                                    onClick={() => setMintAmount(Math.min(3, mintAmount + 1))}
+                                    className="w-8 h-8 flex items-center justify-center border border-white/20 hover:bg-white/10 text-white transition-colors"
+                                >+</button>
+                            </div>
+                        </div>
+
+                        <Button onClick={() => handleMint(mintAmount)} isLoading={isMinting} className="w-full bg-white text-black hover:bg-gray-200 h-12 text-lg">
+                            MINT PROOF OF RUN ({mintAmount})
                         </Button>
                         
                         <Button onClick={restartGame} variant="outline" className="w-full border-white/20 hover:bg-white/10">

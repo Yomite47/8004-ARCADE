@@ -1,0 +1,44 @@
+[
+  {
+    "batchName": "part_1",
+    "carFile": "images_part_1.car",
+    "startId": 1,
+    "endId": 1000,
+    "count": 1000
+  },
+  {
+    "batchName": "part_2",
+    "carFile": "images_part_2.car",
+    "startId": 1001,
+    "endId": 2000,
+    "count": 1000
+  },
+  {
+    "batchName": "part_3",
+    "carFile": "images_part_3.car",
+    "startId": 2001,
+    "endId": 3000,
+    "count": 1000
+  },
+  {
+    "batchName": "part_4",
+    "carFile": "images_part_4.car",
+    "startId": 3001,
+    "endId": 4000,
+    "count": 1000
+  },
+  {
+    "batchName": "part_5",
+    "carFile": "images_part_5.car",
+    "startId": 4001,
+    "endId": 5000,
+    "count": 1000
+  },
+  {
+    "batchName": "part_6",
+    "carFile": "images_part_6.car",
+    "startId": 5001,
+    "endId": 5555,
+    "count": 555
+  }
+]
