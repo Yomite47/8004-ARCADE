@@ -318,7 +318,7 @@ export const HeroSection: React.FC<SectionProps> = ({
             <span className="font-bold text-gray-400">8004 ARCADE</span>
           </div>
           <div className="flex gap-6 text-gray-500 text-sm">
-            <a href="https://x.com/8004Arcade" target="_blank" rel="noopener noreferrer" className="hover:text-white">Twitter</a>
+            <a href="https://x.com/8004Arcade_" target="_blank" rel="noopener noreferrer" className="hover:text-white">Twitter</a>
             <a href="#" className="hover:text-white">Etherscan</a>
           </div>
         </div>
