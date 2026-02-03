@@ -34,3 +34,12 @@ typechain-types/
 # Assets (Optional: Ignore large files if needed)
 *.zip
 *.car
+
+# Temporary Upload Folders
+public/split_images/
+public/split_images_small/
+public/temp_images/
+car_files/
+batch_cids.json
+batch_folder_cids.json
+small_batch_cids.json

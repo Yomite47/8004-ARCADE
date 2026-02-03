@@ -463,8 +463,8 @@ export const MintingSection: React.FC<MintingSectionProps> = ({
                </div>
                <div className="flex justify-between">
                  <span>STATUS</span>
-                 <span className="text-red-400">
-                    SYSTEM OFFLINE
+                 <span className="text-green-400">
+                    SYSTEM ONLINE
                  </span>
                </div>
              </div>
