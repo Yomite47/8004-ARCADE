@@ -512,6 +512,16 @@ export default function App() {
                         </div>
                     </div>
 
+                    <Button 
+                        onClick={() => {
+                            const tweetText = "I JUST MINTED 8004 ARCADE by @8004arcade_ PLAY GAME AND WIN TO MINT PLAYER STATUS: Early 8004 Arcade agent unlocked Next level loading... PLAY NOW: 8004arcade.xyz";
+                            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
+                        }} 
+                        className="w-full mb-4 bg-white text-black hover:bg-gray-200 flex items-center justify-center gap-2"
+                    >
+                        <Share2 size={18} /> SHARE ON X
+                    </Button>
+
                     <Button onClick={restartGame} variant="outline" className="w-full mb-4">
                         START NEW RUN
                     </Button>
