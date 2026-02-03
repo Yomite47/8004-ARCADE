@@ -241,8 +241,17 @@ export default function App() {
           {/* Score Display (In Game) - HIDDEN for surprise */}
           {stage !== AppStage.LANDING && (
              <div className="text-xl font-mono font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] mr-4 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-                <span className="tracking-widest text-green-400">EVALUATING...</span>
+                {score >= getMintThreshold(selectedGame) ? (
+                    <>
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                        <span className="tracking-widest text-green-400">MINT UNLOCKED</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                        <span className="tracking-widest text-yellow-400">EVALUATING...</span>
+                    </>
+                )}
              </div>
           )}
 
